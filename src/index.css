@@ -58,14 +58,12 @@ a {
   font-size: 1.05rem;
 }
 
-.brand-mark {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #ff6b6b, #ffd166, #4ecdc4);
-  color: #071120;
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
 }
 
 .nav-links {

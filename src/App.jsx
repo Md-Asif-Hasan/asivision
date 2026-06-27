@@ -1,3 +1,5 @@
+import logo from '../logo.png';
+
 const apps = [
   {
     name: 'MindForge Arena',
@@ -48,7 +50,7 @@ function App() {
     <div className="page-shell">
       <header className="topbar">
         <a href="#home" className="brand">
-          <span className="brand-mark">A</span>
+          <img src={logo} alt="Asivision logo" className="brand-logo" />
           <span>Asivision</span>
         </a>
         <nav className="nav-links">
