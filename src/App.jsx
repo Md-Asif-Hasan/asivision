@@ -2,14 +2,23 @@ const apps = [
   {
     name: 'MindForge Arena',
     type: 'IQ Mind Games',
+    url: 'https://play.google.com/store/apps/details?id=com.devstudio.iqpro&pli=1',
     description: 'A clever puzzle and strategy experience designed for daily brain training and social competition.',
     badge: 'B2C • Mobile',
   },
   {
     name: 'TAKAJACHAI',
-    type: 'Culture-first engagement',
-    description: 'A vibrant product that blends community, storytelling, and interactive features for modern audiences.',
-    badge: 'Creator • Social',
+    type: 'Counterfeit money checking & business management',
+    url: 'https://play.google.com/apps/internaltest/4700986813283107782',
+    description: 'A powerful app for counterfeit detection and business operations, built for trusted everyday use.',
+    badge: 'Tools • Finance',
+  },
+  {
+    name: 'Eternora',
+    type: 'Life Simulation',
+    url: 'https://play.google.com/apps/testing/com.issb.iqtest',
+    description: 'An upcoming life simulation experience focused on immersive world-building and personal growth.',
+    badge: 'Simulation • Upcoming',
   },
   {
     name: 'VisionPilot',
@@ -141,6 +150,11 @@ function App() {
                 <h3>{app.name}</h3>
                 <p className="app-type">{app.type}</p>
                 <p>{app.description}</p>
+                {app.url && (
+                  <a href={app.url} target="_blank" rel="noreferrer" className="app-link">
+                    View on Google Play
+                  </a>
+                )}
               </article>
             ))}
           </div>
