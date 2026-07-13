@@ -34,7 +34,13 @@ function TakaJachaiPrivacy() {
               fontSize: '0.95rem',
               color: '#7ed6df'
             }}>
-              <strong>Business Tool Notice:</strong> TAKAJACHAI is a business management and counterfeit detection application. It is designed to help businesses verify currency authenticity and manage daily operations. All features are provided for legitimate business purposes only.
+              <strong>Important Disclaimers:</strong>
+              <ul style={{ margin: '8px 0 0 20px', paddingLeft: '20px' }}>
+                <li>TAKAJACHAI is NOT an official currency verification tool and is NOT affiliated with any government, central bank, or financial institution.</li>
+                <li>The counterfeit detection feature provides assistance only and is NOT 100% accurate. Final currency verification should be done through official channels.</li>
+                <li>This app is a business management tool for legitimate business purposes only.</li>
+                <li>We do not provide financial services, banking services, or payment processing directly.</li>
+              </ul>
             </div>
 
             <p>This Privacy Policy explains how <strong>TAKAJACHAI</strong> ("we", "us", or "our") collects, uses, stores, and protects your personal information when you use our mobile application and web platform. By using the app, you agree to the practices described in this policy.</p>
@@ -45,10 +51,19 @@ function TakaJachaiPrivacy() {
               <li><strong>Account Information:</strong> Your name, email address, and business details when you register.</li>
               <li><strong>Authentication Data:</strong> Your password (stored as a bcrypt hash — never in plain text).</li>
               <li><strong>Business Data:</strong> Sales records, inventory data, expense tracking, and financial transactions.</li>
-              <li><strong>Camera Data:</strong> Images captured for counterfeit detection purposes (processed locally when possible).</li>
+              <li><strong>Camera Data:</strong> Images captured for counterfeit detection purposes ONLY with your explicit consent. Images are processed locally when possible and are not stored unless you choose to save them.</li>
               <li><strong>Device Information:</strong> Device type, OS version, and app version for diagnostic and compatibility purposes.</li>
               <li><strong>Usage Data:</strong> Pages visited and features used within the app.</li>
             </ul>
+            <div style={{
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px',
+              padding: '16px 20px',
+              margin: '12px 0'
+            }}>
+              <strong>Camera Permission:</strong> The app requests camera access solely for the counterfeit detection feature. You can revoke this permission at any time in your device settings. We do not access camera for any other purpose.
+            </div>
             <div style={{
               background: 'rgba(255,255,255,0.07)',
               border: '1px solid rgba(255,255,255,0.12)',
@@ -81,6 +96,15 @@ function TakaJachaiPrivacy() {
               <li>All data transmitted between your device and our servers is encrypted via <strong>HTTPS/TLS</strong>.</li>
               <li>Currency images are processed with secure algorithms and stored with encryption when cloud processing is required.</li>
             </ul>
+            <div style={{
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px',
+              padding: '16px 20px',
+              margin: '12px 0'
+            }}>
+              <strong>Financial Data Protection:</strong> We do not store payment card information, bank account details, or sensitive financial credentials. All payment processing is handled through secure third-party payment processors that comply with PCI-DSS standards.
+            </div>
             <p>While we apply strong security practices, no internet transmission is 100% secure. We continuously work to protect your data using commercially reasonable means.</p>
 
             <h3>4. Data Retention</h3>
@@ -125,7 +149,15 @@ function TakaJachaiPrivacy() {
             <h3>10. Changes to This Policy</h3>
             <p>We may update this Privacy Policy from time to time. When we do, we will update the "Last Updated" date at the top of this page. For significant changes, we will notify users via in-app notice or email. Continued use of the app after changes constitutes acceptance of the updated policy.</p>
 
-            <h3>11. Contact Us</h3>
+            <h3>11. Compliance and Legal</h3>
+            <p>TAKAJACHAI is designed to comply with applicable data protection laws including GDPR and other regional privacy regulations. We regularly review our practices to ensure ongoing compliance.</p>
+            <ul>
+              <li><strong>GDPR Compliance:</strong> We provide data subject rights as required by GDPR including access, rectification, erasure, and portability.</li>
+              <li><strong>Data Transfers:</strong> Data is stored and processed within secure data centers. International transfers are conducted with appropriate safeguards.</li>
+              <li><strong>Legal Basis:</strong> We process your data based on your consent, contract performance, legal obligations, and legitimate business interests.</li>
+            </ul>
+
+            <h3>12. Contact Us</h3>
             <p>If you have any questions, concerns, or requests regarding this Privacy Policy or your personal data, please contact us:</p>
             <div style={{
               background: 'rgba(255,255,255,0.07)',
