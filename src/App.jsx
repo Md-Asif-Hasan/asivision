@@ -2,6 +2,7 @@ import logo from '../logo.png';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import TakaJachaiPrivacy from './pages/TakaJachaiPrivacy';
 import IqTestPrivacy from './pages/IqTestPrivacy';
+import EternoraPrivacy from './pages/EternoraPrivacy';
 
 const apps = [
   {
@@ -171,6 +172,11 @@ function App() {
                           Privacy Policy
                         </Link>
                       )}
+                      {app.name === 'Eternora' && (
+                        <Link to="/privacy/eternora" className="app-link">
+                          Privacy Policy
+                        </Link>
+                      )}
                     </article>
                   ))}
                 </div>
@@ -186,6 +192,7 @@ function App() {
         } />
         <Route path="/privacy/taka-jachai" element={<TakaJachaiPrivacy />} />
         <Route path="/privacy/iq-test" element={<IqTestPrivacy />} />
+        <Route path="/privacy/eternora" element={<EternoraPrivacy />} />
       </Routes>
     </Router>
   );
