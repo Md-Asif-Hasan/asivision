@@ -2,7 +2,10 @@ import logo from '../logo.png';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import TakaJachaiPrivacy from './pages/TakaJachaiPrivacy';
 import IqTestPrivacy from './pages/IqTestPrivacy';
+<<<<<<< HEAD
 import EternoraPrivacy from './pages/EternoraPrivacy';
+=======
+>>>>>>> 7035ab34e7e02073fa6dce5ad080a6414a48393f
 
 const apps = [
   {
@@ -172,11 +175,14 @@ function App() {
                           Privacy Policy
                         </Link>
                       )}
+<<<<<<< HEAD
                       {app.name === 'Eternora' && (
                         <Link to="/privacy/eternora" className="app-link">
                           Privacy Policy
                         </Link>
                       )}
+=======
+>>>>>>> 7035ab34e7e02073fa6dce5ad080a6414a48393f
                     </article>
                   ))}
                 </div>
@@ -192,7 +198,10 @@ function App() {
         } />
         <Route path="/privacy/taka-jachai" element={<TakaJachaiPrivacy />} />
         <Route path="/privacy/iq-test" element={<IqTestPrivacy />} />
+<<<<<<< HEAD
         <Route path="/privacy/eternora" element={<EternoraPrivacy />} />
+=======
+>>>>>>> 7035ab34e7e02073fa6dce5ad080a6414a48393f
       </Routes>
     </Router>
   );
