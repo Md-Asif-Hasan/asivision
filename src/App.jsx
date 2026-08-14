@@ -67,6 +67,115 @@ const appsData = [
   },
 ];
 
+// Open Source GitHub Projects Data
+const githubProjectsData = [
+  {
+    id: 'voice-recognition-security',
+    name: 'Voice Recognition System for Home Security',
+    subtitle: 'MATLAB Speech Authentication & Biometric Access Control',
+    category: 'MATLAB • Signal Processing & Biometrics',
+    icon: '🎙️',
+    description: 'Implemented a MATLAB-based voice recognition system for home security applications, enabling access control through speech authentication. Utilizes digital signal processing (DSP), acoustic feature extraction (MFCC), and spectral pattern matching to verify authorized user voice signatures with high precision.',
+    url: 'https://github.com/Md-Asif-Hasan/Voice-Recognition-System-for-Home-Security-Project',
+    badge: 'MATLAB • Security & Speech DSP',
+    techStack: ['MATLAB', 'Signal Processing', 'MFCC', 'Biometric Security', 'Speech Authentication'],
+    features: [
+      'Speech signal feature extraction & frequency analysis',
+      'Real-time acoustic pattern matching & confidence scoring',
+      'Automated smart lock access control interface',
+      'Noise-suppression pre-processing algorithms'
+    ],
+    previews: [
+      '/assets/projects/voice_sec_1.png',
+      '/assets/projects/voice_sec_2.png',
+    ],
+  },
+  {
+    id: 'heart-beat-monitoring',
+    name: 'Heart-Beat Monitoring & Alarm System',
+    subtitle: 'MATLAB ECG Signal Processing & Baseline Deviation Alerts',
+    category: 'MATLAB • Biomedical & Health Tech',
+    icon: '❤️',
+    description: 'Developed a MATLAB-based system that monitors heart rate and signals deviations from baseline levels. Designed for integration with wearable health devices to provide real-time automated alerts upon detecting abnormal BPM fluctuations or potential cardiac arrhythmia.',
+    url: 'https://github.com/Md-Asif-Hasan/Heart-Beat-monitoring-interface-and-alarm-system-for-health-issues',
+    badge: 'MATLAB • Health Tech & Wearables',
+    techStack: ['MATLAB', 'Biomedical DSP', 'ECG Analysis', 'Wearable Tech', 'Health Alerts'],
+    features: [
+      'Automated baseline thresholding & peak detection',
+      'Instant alert triggering on arrhythmia & BPM anomalies',
+      'Wearable telemetry sensor signal processing',
+      'Interactive health monitoring graphical dashboard'
+    ],
+    previews: [
+      '/assets/projects/heart_mon_1.png',
+      '/assets/projects/heart_mon_2.png',
+    ],
+  },
+  {
+    id: 'autonomous-rescue-drone',
+    name: 'Autonomous Rescue Drone System',
+    subtitle: 'AI Computer Vision & Emergency Search-and-Rescue Navigation',
+    category: 'Python • Computer Vision & Autonomous Systems',
+    icon: '🛸',
+    description: 'An autonomous drone system designed to navigate indoor environments and detect trapped or immobilized humans using computer vision and onboard sensor fusion, supporting emergency disaster response and search-and-rescue operations.',
+    url: 'https://github.com/Md-Asif-Hasan/Autonomous-Rescue-Drone-',
+    badge: 'Python • Autonomous AI & Robotics',
+    techStack: ['Python', 'OpenCV', 'Computer Vision', 'Robotics', 'LiDAR & Sensors'],
+    features: [
+      'Indoor GPS-denied autonomous waypoint navigation',
+      'Human detection algorithm using thermal & optical AI',
+      'Real-time sensor telemetry streaming & mapping',
+      'Collision avoidance with ultrasonic & sensor arrays'
+    ],
+    previews: [
+      '/assets/projects/rescue_drone_1.png',
+      '/assets/projects/rescue_drone_2.png',
+    ],
+  },
+  {
+    id: 'sweepbot-floor-cleaner',
+    name: 'SweepBot Automated Floor Cleaner Robot',
+    subtitle: 'Obstacle-Avoiding Mopping Robot with Liquid Dispenser',
+    category: 'C++ • Embedded Systems & Robotics',
+    icon: '🤖',
+    description: 'SweepBot is a low-cost student robot that navigates to a designated target, wets the floor using an onboard DC liquid pump, and mops using an L298N-driven motor. Features an ultrasonic interlock safety mechanism and optional SG90 servo control.',
+    url: 'https://github.com/Md-Asif-Hasan/SweepBot-Automated-Floor-Cleaner-Robot-Project-',
+    badge: 'C++ • Hardware & Autonomous Robotics',
+    techStack: ['C++', 'Arduino', 'L298N H-Bridge', 'HC-SR04 Ultrasonic', 'DC Water Pump'],
+    features: [
+      'Ultrasonic distance interlock for instant collision prevention',
+      'L298N dual H-bridge motor speed & direction control',
+      'Automated DC water pump fluid dispensing system',
+      'Modular chassis design with servo-activated mopping mechanism'
+    ],
+    previews: [
+      '/assets/projects/sweepbot_1.jpg',
+      '/assets/projects/sweepbot_2.jpg',
+    ],
+  },
+  {
+    id: 'smart-iot-chicken-brooding',
+    name: 'Smart IoT Chicken Brooding System',
+    subtitle: 'Arduino Cloud Microcontroller Environment Optimization',
+    category: 'C++ • IoT & Smart Agriculture',
+    icon: '🐔',
+    description: 'Designed and programmed an IoT-based automated chicken brooding system using Arduino Cloud, optimizing environmental climate conditions (temperature, heating, humidity) for poultry farming and young chick incubation.',
+    url: 'https://github.com/Md-Asif-Hasan/Smart-IoT-based-Chicken-Brooding-system',
+    badge: 'C++ • IoT & Smart AgTech',
+    techStack: ['C++', 'Arduino Cloud', 'ESP32/ESP8266', 'DHT Sensors', 'Relays'],
+    features: [
+      'Real-time temperature & humidity monitoring via Arduino Cloud',
+      'Automated heat lamp relay switching based on thermal targets',
+      'Remote alert notification system for environmental anomalies',
+      'Energy-efficient climate control for optimized chick growth'
+    ],
+    previews: [
+      '/assets/projects/brooding_1.jpg',
+      '/assets/projects/brooding_2.jpg',
+    ],
+  },
+];
+
 const services = [
   {
     title: 'Product Strategy & Vision',
@@ -142,6 +251,373 @@ function PhoneSlider({ previews, appName, onOpenLightbox }) {
   );
 }
 
+// Horizontal Mobile Apps Carousel Component
+function AppsHorizontalSection({ onOpenLightbox }) {
+  const [activeAppIndex, setActiveAppIndex] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const interval = setInterval(() => {
+      setActiveAppIndex((prev) => (prev + 1) % appsData.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [isAutoPlay]);
+
+  const handlePrev = () => {
+    setActiveAppIndex((prev) => (prev - 1 + appsData.length) % appsData.length);
+  };
+
+  const handleNext = () => {
+    setActiveAppIndex((prev) => (prev + 1) % appsData.length);
+  };
+
+  return (
+    <section id="apps" className="section">
+      <div className="section-heading reveal">
+        <p className="eyebrow">Project Portfolio</p>
+        <h2>Featured Mobile Applications</h2>
+        <p className="section-subtitle">
+          Scan through live previews, core functionality, and mobile interface design of our flagships.
+        </p>
+      </div>
+
+      <div className="horizontal-slider-wrapper reveal">
+        <div className="horizontal-slider-header">
+          <div className="slider-counter-badge">
+            <span className="counter-current">0{activeAppIndex + 1}</span>
+            <span className="counter-divider">/</span>
+            <span className="counter-total">0{appsData.length}</span>
+          </div>
+          
+          <div className="slider-main-actions">
+            <button
+              className={`autoplay-toggle-btn ${isAutoPlay ? 'active' : ''}`}
+              onClick={() => setIsAutoPlay(!isAutoPlay)}
+            >
+              {isAutoPlay ? '⏸ Pause Auto-Slide' : '▶ Play Auto-Slide'}
+            </button>
+            <div className="slider-arrow-group">
+              <button className="slider-nav-arrow" onClick={handlePrev} aria-label="Previous application">‹</button>
+              <button className="slider-nav-arrow" onClick={handleNext} aria-label="Next application">›</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Carousel Sliding Viewport */}
+        <div className="horizontal-slider-viewport">
+          <div
+            className="horizontal-slider-track"
+            style={{ transform: `translateX(-${activeAppIndex * 100}%)` }}
+          >
+            {appsData.map((app) => (
+              <div key={app.id} className="project-slide-card">
+                <div className="project-slide-grid">
+                  <div className="app-info-side">
+                    {app.stockBanner && (
+                      <div className="stock-feature-banner">
+                        <img src={app.stockBanner} alt={`${app.name} visual`} />
+                        <div className="stock-banner-overlay">
+                          <span className="stock-badge-tag">{app.stockTag}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="app-badge-pill">{app.badge}</div>
+                    <div className="app-header-flex">
+                      <img src={app.logo} alt={`${app.name} logo`} className="app-logo-large" />
+                      <div className="app-title-group">
+                        <h3>{app.name}</h3>
+                        <p className="app-type-tag">{app.type}</p>
+                      </div>
+                    </div>
+                    <p className="app-description">{app.description}</p>
+                    <div className="app-action-row">
+                      <a
+                        href={app.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="app-action-btn"
+                      >
+                        <span>Google Play Store</span>
+                        <span>↗</span>
+                      </a>
+                      <Link to={app.privacyUrl} className="app-action-btn privacy-action-btn">
+                        <span>Privacy Policy</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="app-preview-side">
+                    <PhoneSlider
+                      previews={app.previews}
+                      appName={app.name}
+                      onOpenLightbox={onOpenLightbox}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Workstation Preview Slider Component for Engineering & Hardware Projects
+function WorkstationSlider({ previews, projectName, onOpenLightbox }) {
+  const [imgIndex, setImgIndex] = useState(0);
+
+  useEffect(() => {
+    if (!previews || previews.length <= 1) return;
+    const timer = setInterval(() => {
+      setImgIndex((prev) => (prev + 1) % previews.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [previews]);
+
+  const prevImage = (e) => {
+    e.stopPropagation();
+    setImgIndex((prev) => (prev - 1 + previews.length) % previews.length);
+  };
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    setImgIndex((prev) => (prev + 1) % previews.length);
+  };
+
+  return (
+    <div className="workstation-mockup-frame">
+      <div className="workstation-title-bar">
+        <div className="window-dots">
+          <span className="dot-red" />
+          <span className="dot-yellow" />
+          <span className="dot-green" />
+        </div>
+        <div className="window-title">{projectName}</div>
+        <span className="window-badge">Interactive Preview</span>
+      </div>
+      <div 
+        className="workstation-screen" 
+        onClick={() => onOpenLightbox(previews[imgIndex])} 
+        title="Click to view full resolution image"
+      >
+        {previews.map((src, i) => (
+          <img
+            key={src}
+            src={src}
+            alt={`${projectName} preview ${i + 1}`}
+            className={`workstation-slide-img ${i === imgIndex ? 'active' : ''}`}
+            loading="lazy"
+          />
+        ))}
+        <div className="workstation-overlay-zoom">🔍 Click to Expand</div>
+      </div>
+      {previews.length > 1 && (
+        <div className="workstation-controls">
+          <button className="slider-btn" onClick={prevImage} aria-label="Previous preview">‹</button>
+          <div className="slider-dots">
+            {previews.map((_, idx) => (
+              <span
+                key={idx}
+                className={`dot ${idx === imgIndex ? 'active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setImgIndex(idx); }}
+              />
+            ))}
+          </div>
+          <button className="slider-btn" onClick={nextImage} aria-label="Next preview">›</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Horizontal Project Carousel Component
+function ProjectsHorizontalSection({ onOpenLightbox }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [viewMode, setViewMode] = useState('carousel'); // 'carousel' | 'grid'
+
+  useEffect(() => {
+    if (!isAutoPlay || viewMode !== 'carousel') return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % githubProjectsData.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [isAutoPlay, viewMode]);
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + githubProjectsData.length) % githubProjectsData.length);
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % githubProjectsData.length);
+  };
+
+  return (
+    <section id="projects" className="section projects-section">
+      <div className="section-heading reveal">
+        <p className="eyebrow">🔬 Hardware, IoT & AI Research</p>
+        <h2>Engineering & Intelligent Systems</h2>
+        <p className="section-subtitle">
+          Explore open-source MATLAB speech & health tools, autonomous robotics, computer vision rescue drones, and IoT agricultural systems.
+        </p>
+
+        {/* View Control */}
+        <div className="project-view-controls">
+          <div className="view-toggle-btns">
+            <button
+              className={`view-toggle-btn ${viewMode === 'carousel' ? 'active' : ''}`}
+              onClick={() => setViewMode('carousel')}
+              title="Horizontal Sliding Carousel View"
+            >
+              ↔ Sliding Carousel
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Grid View"
+            >
+              ⊞ Grid View
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {viewMode === 'carousel' ? (
+        <div className="horizontal-slider-wrapper reveal">
+          <div className="horizontal-slider-header">
+            <div className="slider-counter-badge">
+              <span className="counter-current">0{activeIndex + 1}</span>
+              <span className="counter-divider">/</span>
+              <span className="counter-total">0{githubProjectsData.length}</span>
+            </div>
+            
+            <div className="slider-main-actions">
+              <button
+                className={`autoplay-toggle-btn ${isAutoPlay ? 'active' : ''}`}
+                onClick={() => setIsAutoPlay(!isAutoPlay)}
+              >
+                {isAutoPlay ? '⏸ Pause Auto-Slide' : '▶ Play Auto-Slide'}
+              </button>
+              <div className="slider-arrow-group">
+                <button className="slider-nav-arrow" onClick={handlePrev} aria-label="Previous project">‹</button>
+                <button className="slider-nav-arrow" onClick={handleNext} aria-label="Next project">›</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Carousel Sliding Viewport */}
+          <div className="horizontal-slider-viewport">
+            <div
+              className="horizontal-slider-track"
+              style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+            >
+              {githubProjectsData.map((project) => (
+                <div key={project.id} className="project-slide-card">
+                  <div className="project-slide-grid">
+                    {/* Left Column: Info */}
+                    <div className="project-slide-info">
+                      <div className="app-badge-pill project-badge-pill">{project.category}</div>
+                      
+                      <div className="project-title-header">
+                        <div>
+                          <h3>{project.name}</h3>
+                          <p className="project-subtitle">{project.subtitle}</p>
+                        </div>
+                      </div>
+
+                      <p className="project-description-text">{project.description}</p>
+
+                      <div className="tech-stack-row">
+                        {project.techStack.map((tech) => (
+                          <span key={tech} className="tech-tag-pill">{tech}</span>
+                        ))}
+                      </div>
+
+                      <div className="project-features-list">
+                        <h4>Key Technical Highlights:</h4>
+                        <ul>
+                          {project.features.map((feat, fIdx) => (
+                            <li key={fIdx}>
+                              <span className="feature-check">✓</span>
+                              <span>{feat}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="project-action-row">
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-github"
+                        >
+                          <svg className="github-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                          </svg>
+                          <span>GitHub Repository</span>
+                          <span className="arrow-icon">↗</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Workstation Screen Preview */}
+                    <div className="project-slide-preview">
+                      <WorkstationSlider
+                        previews={project.previews}
+                        projectName={project.name}
+                        onOpenLightbox={onOpenLightbox}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Grid Fallback Mode */
+        <div className="projects-grid-container reveal">
+          {githubProjectsData.map((project) => (
+            <div key={project.id} className="project-grid-card">
+              <div className="project-grid-preview-box" onClick={() => onOpenLightbox(project.previews[0])}>
+                <img src={project.previews[0]} alt={project.name} className="project-grid-img" />
+                <div className="grid-overlay-tag">{project.badge}</div>
+              </div>
+              <div className="project-grid-content">
+                <div className="project-title-header">
+                  <h3>{project.name}</h3>
+                </div>
+                <p className="project-description-text">{project.description}</p>
+                <div className="tech-stack-row">
+                  {project.techStack.map((tech) => (
+                    <span key={tech} className="tech-tag-pill">{tech}</span>
+                  ))}
+                </div>
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-github btn-block"
+                >
+                  <svg className="github-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  <span>GitHub Repository</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 // Main Landing Page Component
 function LandingPage() {
   const [lightboxImg, setLightboxImg] = useState(null);
@@ -186,6 +662,7 @@ function LandingPage() {
         </Link>
         <nav className="nav-links">
           <a href="#apps">Apps</a>
+          <a href="#projects">Projects</a>
           <a href="#services">Services</a>
           <a href="#about">About</a>
           <a href="#contact" className="nav-btn">Contact Us</a>
@@ -199,28 +676,30 @@ function LandingPage() {
             <p className="eyebrow">Creative Product Studio</p>
             <h1>We build & scale digital experiences that matter.</h1>
             <p className="hero-text">
-              Asivision crafts state-of-the-art mobile apps, computer vision tools, and brain gaming platforms with sleek UX, robust architecture, and growth-focused execution.
+              Asivision crafts state-of-the-art mobile apps, computer vision tools, autonomous robotics, and brain gaming platforms with sleek UX, robust architecture, and growth-focused execution.
             </p>
             <div className="hero-actions">
               <a href="#apps" className="btn btn-primary">
                 <span>Explore Featured Apps</span>
                 <span>→</span>
               </a>
-              <a href="#contact" className="btn btn-secondary">Get in Touch</a>
+              <a href="#projects" className="btn btn-secondary">
+                <span>Open-Source Repos</span>
+              </a>
             </div>
             
             <div className="stats-grid">
               <div className="stat-item">
                 <span className="stat-number">3+</span>
-                <span className="stat-label">Major Mobile Apps</span>
+                <span className="stat-label">Mobile Apps</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">5+</span>
+                <span className="stat-label">Hardware & AI Repos</span>
               </div>
               <div className="stat-item">
                 <span className="stat-number">100%</span>
-                <span className="stat-label">User-Centric Design</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">4.9/5</span>
-                <span className="stat-label">Satisfaction Score</span>
+                <span className="stat-label">Precision Engineering</span>
               </div>
             </div>
           </div>
@@ -230,10 +709,10 @@ function LandingPage() {
               <img src="/assets/stock/hero_stock.jpg" alt="Tech Product Studio Visual" className="hero-stock-preview" />
               <p className="eyebrow">Active Ecosystem</p>
               <h3 style={{ fontSize: '1.3rem', color: '#fff', margin: '4px 0 12px' }}>
-                Engineered for Impact Across Mobile & Web
+                Engineered for Impact Across Mobile, Web & Robotics
               </h3>
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem', marginBottom: '16px' }}>
-                Delivering high-performance applications in finance, intelligence testing, and life simulation.
+                Delivering high-performance solutions in finance, intelligence testing, computer vision, and IoT automation.
               </p>
 
               <div className="hero-apps-row">
@@ -247,68 +726,11 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* Featured Apps Showcase Section */}
-        <section id="apps" className="section">
-          <div className="section-heading reveal">
-            <p className="eyebrow">Project Portfolio</p>
-            <h2>Featured Mobile Applications</h2>
-            <p className="section-subtitle">
-              Scan through live previews, core functionality, and mobile interface design of our flagships.
-            </p>
-          </div>
+        {/* Featured Mobile Applications (Horizontal Sliding Carousel) */}
+        <AppsHorizontalSection onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)} />
 
-          <div className="app-showcase-container">
-            {appsData.map((app, index) => (
-              <div
-                key={app.id}
-                className={`app-display-card reveal ${index % 2 !== 0 ? 'reverse' : ''}`}
-              >
-                <div className="app-info-side">
-                  {app.stockBanner && (
-                    <div className="stock-feature-banner">
-                      <img src={app.stockBanner} alt={`${app.name} visual`} />
-                      <div className="stock-banner-overlay">
-                        <span className="stock-badge-tag">{app.stockTag}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="app-badge-pill">{app.badge}</div>
-                  <div className="app-header-flex">
-                    <img src={app.logo} alt={`${app.name} logo`} className="app-logo-large" />
-                    <div className="app-title-group">
-                      <h3>{app.name}</h3>
-                      <p className="app-type-tag">{app.type}</p>
-                    </div>
-                  </div>
-                  <p className="app-description">{app.description}</p>
-                  <div className="app-action-row">
-                    <a
-                      href={app.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="app-action-btn"
-                    >
-                      <span>Google Play Store</span>
-                      <span>↗</span>
-                    </a>
-                    <Link to={app.privacyUrl} className="app-action-btn privacy-action-btn">
-                      <span>Privacy Policy</span>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="app-preview-side">
-                  <PhoneSlider
-                    previews={app.previews}
-                    appName={app.name}
-                    onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Open Source Hardware, IoT & AI Research Projects (Horizontal Sliding Carousel) */}
+        <ProjectsHorizontalSection onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)} />
 
 
         {/* Services & Capabilities Section */}
