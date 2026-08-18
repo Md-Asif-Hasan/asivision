@@ -1,7 +1,23 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/webhooks/lemonsqueezy",
+      "destination": "/api/webhooks/lemonsqueezy.js"
+    },
+    {
+      "source": "/api/entitlement",
+      "destination": "/api/entitlement.js"
+    },
+    {
+      "source": "/api/checkout",
+      "destination": "/api/checkout.js"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

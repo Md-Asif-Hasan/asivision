@@ -1,11 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import logo from '../logo.png';
+
+// Privacy pages (pre-existing)
 import TakaJachaiPrivacy from './pages/TakaJachaiPrivacy';
 import IqTestPrivacy from './pages/IqTestPrivacy';
 import EternoraPrivacy from './pages/EternoraPrivacy';
 
-// Project Showcase Data
+// New shared components
+import Topbar from './components/Topbar';
+import Navbar from './components/Navbar';
+import ServicesSection from './components/ServicesSection';
+import CtaBanner from './components/CtaBanner';
+import Footer from './components/Footer';
+
+// New pages
+import PricingPage from './pages/PricingPage';
+import LoginPage from './pages/LoginPage';
+import AccountPage from './pages/AccountPage';
+import SupportPage from './pages/SupportPage';
+import AdminPage from './pages/AdminPage';
+import TermsPage from './pages/TermsPage';
+import RefundPage from './pages/RefundPage';
+
+// Auth context
+import { AuthProvider } from './context/AuthContext';
+
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
 const appsData = [
   {
     id: 'taka-jachai',
@@ -67,7 +89,6 @@ const appsData = [
   },
 ];
 
-// Open Source GitHub Projects Data
 const githubProjectsData = [
   {
     id: 'voice-recognition-security',
@@ -86,7 +107,7 @@ const githubProjectsData = [
       'Noise-suppression pre-processing algorithms'
     ],
     previews: [
-      '/assets/projects/voice_sec_1.png',
+      '/assets/projects/voice recognition security system.png',
       '/assets/projects/voice_sec_2.png',
     ],
   },
@@ -107,7 +128,7 @@ const githubProjectsData = [
       'Interactive health monitoring graphical dashboard'
     ],
     previews: [
-      '/assets/projects/heart_mon_1.png',
+      '/assets/projects/ECG monitor system.png',
       '/assets/projects/heart_mon_2.png',
     ],
   },
@@ -128,7 +149,7 @@ const githubProjectsData = [
       'Collision avoidance with ultrasonic & sensor arrays'
     ],
     previews: [
-      '/assets/projects/rescue_drone_1.png',
+      '/assets/projects/autonomous drone.png',
       '/assets/projects/rescue_drone_2.png',
     ],
   },
@@ -149,7 +170,7 @@ const githubProjectsData = [
       'Modular chassis design with servo-activated mopping mechanism'
     ],
     previews: [
-      '/assets/projects/sweepbot_1.jpg',
+      '/assets/projects/sweep bot.png',
       '/assets/projects/sweepbot_2.jpg',
     ],
   },
@@ -170,31 +191,14 @@ const githubProjectsData = [
       'Energy-efficient climate control for optimized chick growth'
     ],
     previews: [
-      '/assets/projects/brooding_1.jpg',
+      '/assets/projects/chicken brooding system.png',
       '/assets/projects/brooding_2.jpg',
     ],
   },
 ];
 
-const services = [
-  {
-    title: 'Product Strategy & Vision',
-    icon: '🎯',
-    text: 'We define product positioning, target market strategies, and intuitive user journeys for mobile and web applications.',
-  },
-  {
-    title: 'Full-Stack Mobile & Web',
-    icon: '⚡',
-    text: 'From scalable React/Vite web apps to high-performance cross-platform Android mobile applications with modern UX.',
-  },
-  {
-    title: 'Computer Vision & AI Integration',
-    icon: '🧠',
-    text: 'Integrating machine learning models, image classification, real-time object detection, and smart predictive analytics.',
-  },
-];
+// ─── PRESERVED SLIDER COMPONENTS ─────────────────────────────────────────────
 
-// Smartphone Preview Slider Component
 function PhoneSlider({ previews, appName, onOpenLightbox }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -251,7 +255,6 @@ function PhoneSlider({ previews, appName, onOpenLightbox }) {
   );
 }
 
-// Horizontal Mobile Apps Carousel Component
 function AppsHorizontalSection({ onOpenLightbox }) {
   const [activeAppIndex, setActiveAppIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
@@ -289,7 +292,6 @@ function AppsHorizontalSection({ onOpenLightbox }) {
             <span className="counter-divider">/</span>
             <span className="counter-total">0{appsData.length}</span>
           </div>
-          
           <div className="slider-main-actions">
             <button
               className={`autoplay-toggle-btn ${isAutoPlay ? 'active' : ''}`}
@@ -304,7 +306,6 @@ function AppsHorizontalSection({ onOpenLightbox }) {
           </div>
         </div>
 
-        {/* Carousel Sliding Viewport */}
         <div className="horizontal-slider-viewport">
           <div
             className="horizontal-slider-track"
@@ -322,7 +323,6 @@ function AppsHorizontalSection({ onOpenLightbox }) {
                         </div>
                       </div>
                     )}
-
                     <div className="app-badge-pill">{app.badge}</div>
                     <div className="app-header-flex">
                       <img src={app.logo} alt={`${app.name} logo`} className="app-logo-large" />
@@ -333,12 +333,7 @@ function AppsHorizontalSection({ onOpenLightbox }) {
                     </div>
                     <p className="app-description">{app.description}</p>
                     <div className="app-action-row">
-                      <a
-                        href={app.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="app-action-btn"
-                      >
+                      <a href={app.url} target="_blank" rel="noreferrer" className="app-action-btn">
                         <span>Google Play Store</span>
                         <span>↗</span>
                       </a>
@@ -365,7 +360,6 @@ function AppsHorizontalSection({ onOpenLightbox }) {
   );
 }
 
-// Workstation Preview Slider Component for Engineering & Hardware Projects
 function WorkstationSlider({ previews, projectName, onOpenLightbox }) {
   const [imgIndex, setImgIndex] = useState(0);
 
@@ -398,9 +392,9 @@ function WorkstationSlider({ previews, projectName, onOpenLightbox }) {
         <div className="window-title">{projectName}</div>
         <span className="window-badge">Interactive Preview</span>
       </div>
-      <div 
-        className="workstation-screen" 
-        onClick={() => onOpenLightbox(previews[imgIndex])} 
+      <div
+        className="workstation-screen"
+        onClick={() => onOpenLightbox(previews[imgIndex])}
         title="Click to view full resolution image"
       >
         {previews.map((src, i) => (
@@ -433,11 +427,10 @@ function WorkstationSlider({ previews, projectName, onOpenLightbox }) {
   );
 }
 
-// Horizontal Project Carousel Component
 function ProjectsHorizontalSection({ onOpenLightbox }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
-  const [viewMode, setViewMode] = useState('carousel'); // 'carousel' | 'grid'
+  const [viewMode, setViewMode] = useState('carousel');
 
   useEffect(() => {
     if (!isAutoPlay || viewMode !== 'carousel') return;
@@ -463,21 +456,17 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
         <p className="section-subtitle">
           Explore open-source MATLAB speech & health tools, autonomous robotics, computer vision rescue drones, and IoT agricultural systems.
         </p>
-
-        {/* View Control */}
         <div className="project-view-controls">
           <div className="view-toggle-btns">
             <button
               className={`view-toggle-btn ${viewMode === 'carousel' ? 'active' : ''}`}
               onClick={() => setViewMode('carousel')}
-              title="Horizontal Sliding Carousel View"
             >
               ↔ Sliding Carousel
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
-              title="Grid View"
             >
               ⊞ Grid View
             </button>
@@ -493,7 +482,6 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
               <span className="counter-divider">/</span>
               <span className="counter-total">0{githubProjectsData.length}</span>
             </div>
-            
             <div className="slider-main-actions">
               <button
                 className={`autoplay-toggle-btn ${isAutoPlay ? 'active' : ''}`}
@@ -508,7 +496,6 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
             </div>
           </div>
 
-          {/* Carousel Sliding Viewport */}
           <div className="horizontal-slider-viewport">
             <div
               className="horizontal-slider-track"
@@ -517,25 +504,20 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
               {githubProjectsData.map((project) => (
                 <div key={project.id} className="project-slide-card">
                   <div className="project-slide-grid">
-                    {/* Left Column: Info */}
                     <div className="project-slide-info">
                       <div className="app-badge-pill project-badge-pill">{project.category}</div>
-                      
                       <div className="project-title-header">
                         <div>
                           <h3>{project.name}</h3>
                           <p className="project-subtitle">{project.subtitle}</p>
                         </div>
                       </div>
-
                       <p className="project-description-text">{project.description}</p>
-
                       <div className="tech-stack-row">
                         {project.techStack.map((tech) => (
                           <span key={tech} className="tech-tag-pill">{tech}</span>
                         ))}
                       </div>
-
                       <div className="project-features-list">
                         <h4>Key Technical Highlights:</h4>
                         <ul>
@@ -547,14 +529,8 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
                           ))}
                         </ul>
                       </div>
-
                       <div className="project-action-row">
-                        <a
-                          href={project.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="btn btn-github"
-                        >
+                        <a href={project.url} target="_blank" rel="noreferrer" className="btn btn-github">
                           <svg className="github-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                           </svg>
@@ -563,8 +539,6 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
                         </a>
                       </div>
                     </div>
-
-                    {/* Right Column: Workstation Screen Preview */}
                     <div className="project-slide-preview">
                       <WorkstationSlider
                         previews={project.previews}
@@ -579,7 +553,6 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
           </div>
         </div>
       ) : (
-        /* Grid Fallback Mode */
         <div className="projects-grid-container reveal">
           {githubProjectsData.map((project) => (
             <div key={project.id} className="project-grid-card">
@@ -597,12 +570,7 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
                     <span key={tech} className="tech-tag-pill">{tech}</span>
                   ))}
                 </div>
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-github btn-block"
-                >
+                <a href={project.url} target="_blank" rel="noreferrer" className="btn btn-github btn-block">
                   <svg className="github-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                   </svg>
@@ -618,10 +586,10 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
   );
 }
 
-// Main Landing Page Component
+// ─── MAIN LANDING PAGE ────────────────────────────────────────────────────────
+
 function LandingPage() {
   const [lightboxImg, setLightboxImg] = useState(null);
-  const [copiedEmail, setCopiedEmail] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -632,21 +600,15 @@ function LandingPage() {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
 
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText('asifhasan10122000@gmail.com');
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2500);
-  };
-
   return (
-    <div className="page-shell">
+    <div className="page-shell-full">
       {/* Background Ambient Effects */}
       <div className="bg-ambient">
         <div className="ambient-orb orb-1" />
@@ -654,167 +616,90 @@ function LandingPage() {
         <div className="ambient-orb orb-3" />
       </div>
 
-      {/* Header Topbar Navigation */}
-      <header className="topbar">
-        <Link to="/" className="brand">
-          <img src={logo} alt="Asivision logo" className="brand-logo" />
-          <span>Asivision</span>
-        </Link>
-        <nav className="nav-links">
-          <a href="#apps">Apps</a>
-          <a href="#projects">Projects</a>
-          <a href="#services">Services</a>
-          <a href="#about">About</a>
-          <a href="#contact" className="nav-btn">Contact Us</a>
-        </nav>
-      </header>
+      <Topbar />
+      <Navbar />
 
-      <main id="home">
-        {/* Hero Section */}
-        <section className="hero">
-          <div className="hero-copy reveal">
-            <p className="eyebrow">Creative Product Studio</p>
-            <h1>We build & scale digital experiences that matter.</h1>
-            <p className="hero-text">
-              Asivision crafts state-of-the-art mobile apps, computer vision tools, autonomous robotics, and brain gaming platforms with sleek UX, robust architecture, and growth-focused execution.
-            </p>
-            <div className="hero-actions">
-              <a href="#apps" className="btn btn-primary">
-                <span>Explore Featured Apps</span>
-                <span>→</span>
-              </a>
-              <a href="#projects" className="btn btn-secondary">
-                <span>Open-Source Repos</span>
-              </a>
-            </div>
-            
-            <div className="stats-grid">
-              <div className="stat-item">
-                <span className="stat-number">3+</span>
-                <span className="stat-label">Mobile Apps</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">5+</span>
-                <span className="stat-label">Hardware & AI Repos</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">100%</span>
-                <span className="stat-label">Precision Engineering</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="hero-card reveal reveal-delay-1">
-            <div className="hero-glass-card">
-              <img src="/assets/stock/hero_stock.jpg" alt="Tech Product Studio Visual" className="hero-stock-preview" />
-              <p className="eyebrow">Active Ecosystem</p>
-              <h3 style={{ fontSize: '1.3rem', color: '#fff', margin: '4px 0 12px' }}>
-                Engineered for Impact Across Mobile, Web & Robotics
-              </h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem', marginBottom: '16px' }}>
-                Delivering high-performance solutions in finance, intelligence testing, computer vision, and IoT automation.
+      <div className="page-shell">
+        <main id="home">
+          {/* ── HERO SECTION ── */}
+          <section className="hero">
+            <div className="hero-copy reveal">
+              <div className="badge-pill-gradient">⚡ Digital Product Studio & SaaS Ecosystem</div>
+              <h1>We Build & Scale Digital Experiences That Matter.</h1>
+              <p className="hero-text">
+                Asivision crafts high-performance mobile apps, computer vision tools, autonomous robotics, and brain gaming platforms — plus Google Play Console expertise, targeted digital marketing, and enterprise custom IT & IoT solutions.
               </p>
-
-              <div className="hero-apps-row">
-                {appsData.map((app) => (
-                  <div key={app.id} className="hero-app-badge-item" title={app.name}>
-                    <img src={app.logo} alt={app.name} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Mobile Applications (Horizontal Sliding Carousel) */}
-        <AppsHorizontalSection onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)} />
-
-        {/* Open Source Hardware, IoT & AI Research Projects (Horizontal Sliding Carousel) */}
-        <ProjectsHorizontalSection onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)} />
-
-
-        {/* Services & Capabilities Section */}
-        <section id="services" className="section">
-          <div className="section-heading reveal">
-            <p className="eyebrow">Core Capabilities</p>
-            <h2>What We Bring to the Table</h2>
-          </div>
-
-          <div className="service-grid">
-            {services.map((service, index) => (
-              <div key={service.title} className={`service-card reveal reveal-delay-${(index % 3) + 1}`}>
-                <div className="card-icon-box">{service.icon}</div>
-                <h3>{service.title}</h3>
-                <p>{service.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section id="about" className="section">
-          <div className="section-heading reveal">
-            <p className="eyebrow">Why Asivision</p>
-            <h2>Quality Engineering Meets Purposeful Design</h2>
-          </div>
-
-          <div className="about-grid">
-            <div className="about-card reveal reveal-delay-1">
-              <h3>Precision Engineering</h3>
-              <p>Clean architecture, resilient backend APIs, and responsive mobile interfaces crafted with performance in mind.</p>
-            </div>
-            <div className="about-card reveal reveal-delay-2">
-              <h3>User-First Innovation</h3>
-              <p>Every micro-interaction and workflow is tested to provide maximum clarity, speed, and user delight.</p>
-            </div>
-            <div className="about-card reveal reveal-delay-3">
-              <h3>Growth & Scalability</h3>
-              <p>Built from ground up for reliable scaling, seamless updates, and sustainable product momentum.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Us Section */}
-        <section id="contact" className="contact-section section">
-          <div className="section-heading reveal">
-            <p className="eyebrow">Get in Touch</p>
-            <h2>Let's Connect & Collaborate</h2>
-            <p className="section-subtitle">
-              Have questions, feedback, or partnership ideas? Reach out to us directly via email or phone.
-            </p>
-          </div>
-
-          <div className="contact-card-grid">
-            <div className="contact-item-card reveal reveal-delay-1">
-              <div className="contact-icon-wrapper">✉</div>
-              <h3>Email Us</h3>
-              <p className="contact-detail">asifhasan10122000@gmail.com</p>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <a href="mailto:asifhasan10122000@gmail.com" className="btn btn-primary">
-                  Send Email
+              <div className="hero-actions">
+                <a href="#apps" className="btn btn-primary">
+                  <span>Explore Featured Apps</span>
+                  <span>→</span>
                 </a>
-                <button onClick={handleCopyEmail} className="btn btn-secondary">
-                  {copiedEmail ? 'Copied! ✓' : 'Copy Address'}
-                </button>
-              </div>
-            </div>
-
-            <div className="contact-item-card reveal reveal-delay-2">
-              <div className="contact-icon-wrapper">📞</div>
-              <h3>Direct Phone & WhatsApp</h3>
-              <p className="contact-detail">+880 1769-920324</p>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <a href="tel:+8801769920324" className="btn btn-primary">
-                  Call Now
-                </a>
-                <a href="https://wa.me/8801769920324" target="_blank" rel="noreferrer" className="btn btn-secondary">
-                  WhatsApp
+                <Link to="/pricing" className="btn btn-primary" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' }}>
+                  <span>⚡ Get Pro Access</span>
+                </Link>
+                <a href="#services" className="btn btn-secondary">
+                  <span>Our Services</span>
                 </a>
               </div>
+
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <span className="stat-number">3+</span>
+                  <span className="stat-label">Live Mobile Apps</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-number">5+</span>
+                  <span className="stat-label">Hardware & AI Projects</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-number">4</span>
+                  <span className="stat-label">Specialized Services</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-number">100%</span>
+                  <span className="stat-label">Engineering Precision</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
+
+            {/* Hero Visual Card */}
+            <div className="hero-visual-card reveal reveal-delay-1">
+              <img
+                src="/assets/services/hero-image-1.png"
+                alt="Asivision Digital Product Studio"
+                className="hero-featured-image"
+                onError={(e) => {
+                  e.target.src = '/assets/stock/hero_stock.jpg';
+                }}
+              />
+              <div className="hero-visual-content">
+                <h3>Engineering Innovation Across Mobile, Web & Robotics</h3>
+                <p>Delivering high-performance solutions in AI vision, cognitive gaming, IoT automation, and digital growth.</p>
+                <div className="hero-apps-pill-row">
+                  {appsData.map((app) => (
+                    <div key={app.id} className="hero-app-mini-pill">
+                      <img src={app.logo} alt={app.name} />
+                      <span>{app.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── FEATURED MOBILE APPS (Preserved Horizontal Slider) ── */}
+          <AppsHorizontalSection onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)} />
+
+          {/* ── ENGINEERING & AI PROJECTS (Preserved Horizontal Slider) ── */}
+          <ProjectsHorizontalSection onOpenLightbox={(imgSrc) => setLightboxImg(imgSrc)} />
+
+          {/* ── SERVICES SECTION (InventDiv-style) ── */}
+          <ServicesSection />
+
+          {/* ── CTA BANNER ── */}
+          <CtaBanner />
+        </main>
+      </div>
 
       {/* Lightbox Modal */}
       {lightboxImg && (
@@ -826,31 +711,52 @@ function LandingPage() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="footer">
-        <p>© 2026 Asivision Studio. Crafting apps with purpose & precision.</p>
-        <div style={{ display: 'flex', gap: '20px' }}>
-          <Link to="/privacy/taka-jachai" className="footer-link">Taka Jachai Privacy</Link>
-          <Link to="/privacy/iq-test" className="footer-link">IQ Test Privacy</Link>
-          <Link to="/privacy/eternora" className="footer-link">Eternora Privacy</Link>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
 
+// ─── APP ROUTER ───────────────────────────────────────────────────────────────
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/privacy/taka-jachai" element={<TakaJachaiPrivacy />} />
-        <Route path="/privacy/iq-test" element={<IqTestPrivacy />} />
-        <Route path="/privacy/eternora" element={<EternoraPrivacy />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Main Landing */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Pricing & Pro Access (Paywall Integration) */}
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/pro" element={<PricingPage />} />
+
+          {/* Authentication */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<LoginPage />} />
+
+          {/* User Account Dashboard */}
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/dashboard" element={<AccountPage />} />
+
+          {/* Contact & Support */}
+          <Route path="/support" element={<SupportPage />} />
+          <Route path="/contact" element={<SupportPage />} />
+
+          {/* Admin Portal */}
+          <Route path="/admin" element={<AdminPage />} />
+
+          {/* Legal Pages */}
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/refund" element={<RefundPage />} />
+
+          {/* App Privacy Policies */}
+          <Route path="/privacy/taka-jachai" element={<TakaJachaiPrivacy />} />
+          <Route path="/privacy/iq-test" element={<IqTestPrivacy />} />
+          <Route path="/privacy/eternora" element={<EternoraPrivacy />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
 export default App;
-
