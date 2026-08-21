@@ -53,9 +53,9 @@ export default function Navbar() {
 
         {/* Action Controls */}
         <div className="navbar-actions">
-          <Link to="/pricing" className={`btn-nav-pro ${entitlement.isPro ? 'is-pro' : ''}`}>
+          <Link to="/pricing" className={`btn-nav-pro ${entitlement.isPro && !entitlement.isCancelled ? 'is-pro' : ''}`}>
             <Sparkles className="btn-icon" />
-            <span>{entitlement.isPro ? 'Pro Active ✓' : 'Get Pro Access'}</span>
+            <span>{entitlement.isPro && !entitlement.isCancelled ? 'Pro Active ✓' : 'Get Pro Access'}</span>
           </Link>
 
           {user ? (
