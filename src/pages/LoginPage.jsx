@@ -130,7 +130,7 @@ export default function LoginPage() {
             <p className="auth-subtitle">
               {mode === 'reset'
                 ? "Enter your account email and we'll send you a password recovery link."
-                : 'One account unlocks MindForge Arena, Eternora, and all upcoming digital SaaS tools.'}
+                : 'One account unlocks current and all upcoming digital SaaS tools.'}
             </p>
           </div>
 

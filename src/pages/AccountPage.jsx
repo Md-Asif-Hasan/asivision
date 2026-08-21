@@ -256,7 +256,7 @@ export default function AccountPage() {
                 <div className="lifetime-banner-box">
                   <div className="lifetime-badge">♾️ LIFETIME ENTITLEMENT</div>
                   <h4>Unlimited Permanent Pro Access</h4>
-                  <p>Your account is permanently unlocked across MindForge Arena, Eternora, and all future Asivision SaaS tools.</p>
+                  <p>Your account is permanently unlocked across current and all future Asivision SaaS tools.</p>
                 </div>
               ) : entitlement.isPro ? (
                 <div className="countdown-timer-wrapper flex flex-col items-center">
