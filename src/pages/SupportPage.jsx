@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CUSTOM_SERVICES } from '../config/services';
-import Topbar from '../components/Topbar';
+import { saveInquiry } from '../config/adminSettings';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -45,11 +45,22 @@ export default function SupportPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate sending inquiry
+    const inquiryPayload = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      serviceType,
+      projectScope: formData.projectScope,
+      budget: formData.budget,
+      preferredPayment: formData.preferredPayment
+    };
+
+    saveInquiry(inquiryPayload);
+
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmittedSuccess(true);
-    }, 1000);
+    }, 600);
   };
 
   const handleCopyEmail = () => {
@@ -60,7 +71,6 @@ export default function SupportPage() {
 
   return (
     <div className="page-shell-full">
-      <Topbar />
       <Navbar />
 
       <main className="support-main-container">
@@ -257,7 +267,7 @@ export default function SupportPage() {
                       <option value="Payoneer Invoice / Request Link">Payoneer Invoice / Request Link</option>
                       <option value="Credit / Debit Card via Payoneer">Credit / Debit Card via Payoneer</option>
                       <option value="Local Bank Wire (Bangladesh)">Local Bank Wire (Bangladesh)</option>
-                      <option value="Lemon Squeezy (SaaS Pro Plans Only)">Lemon Squeezy (SaaS Pro Plans Only)</option>
+                      <option value="Gumroad (SaaS Pro Plans Only)">Gumroad (SaaS Pro Plans Only)</option>
                     </select>
                   </div>
                 </div>
@@ -294,7 +304,7 @@ export default function SupportPage() {
                   <MapPin className="icon-sm text-indigo-400 shrink-0" />
                   <div>
                     <strong>Headquarters Location:</strong>
-                    <p className="text-xs text-slate-400">Dhaka, Bangladesh</p>
+                    <p className="text-xs text-slate-400">{adminSettings?.contact?.location || "608/1, Kazla, Rajshahi, Bangladesh"}</p>
                     <p className="text-xs text-slate-400">Serving global clients across USA, Europe, South Asia & Middle East</p>
                   </div>
                 </div>

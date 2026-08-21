@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import logo from '../logo.png';
 
-// Privacy pages (pre-existing)
-import TakaJachaiPrivacy from './pages/TakaJachaiPrivacy';
-import IqTestPrivacy from './pages/IqTestPrivacy';
-import EternoraPrivacy from './pages/EternoraPrivacy';
-
-// New shared components
-import Topbar from './components/Topbar';
+// Shared components
 import Navbar from './components/Navbar';
 import ServicesSection from './components/ServicesSection';
 import CtaBanner from './components/CtaBanner';
@@ -22,6 +16,7 @@ import SupportPage from './pages/SupportPage';
 import AdminPage from './pages/AdminPage';
 import TermsPage from './pages/TermsPage';
 import RefundPage from './pages/RefundPage';
+import AppPrivacyPage from './pages/AppPrivacyPage';
 
 // Auth context
 import { AuthProvider } from './context/AuthContext';
@@ -616,7 +611,6 @@ function LandingPage() {
         <div className="ambient-orb orb-3" />
       </div>
 
-      <Topbar />
       <Navbar />
 
       <div className="page-shell">
@@ -718,10 +712,54 @@ function LandingPage() {
 
 // ─── APP ROUTER ───────────────────────────────────────────────────────────────
 
+function ScrollToTopAndReveal() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const revealAll = () => {
+      document.querySelectorAll('.reveal').forEach((el) => {
+        el.classList.add('active');
+      });
+    };
+
+    // First pass: after paint (rAF ensures DOM is fully flushed to layout)
+    const raf = requestAnimationFrame(revealAll);
+    // Second pass: catches elements from conditionally-rendered/auth-gated components
+    const timer = setTimeout(revealAll, 200);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+
+    // Observe after rAF so newly-mounted elements are included
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTopAndReveal />
         <Routes>
           {/* Main Landing */}
           <Route path="/" element={<LandingPage />} />
@@ -749,10 +787,12 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/refund" element={<RefundPage />} />
 
-          {/* App Privacy Policies */}
-          <Route path="/privacy/taka-jachai" element={<TakaJachaiPrivacy />} />
-          <Route path="/privacy/iq-test" element={<IqTestPrivacy />} />
-          <Route path="/privacy/eternora" element={<EternoraPrivacy />} />
+          {/* App Privacy Policies — all apps (static or dynamically created in /admin) use the modern AppPrivacyPage */}
+          <Route path="/privacy/taka-jachai" element={<AppPrivacyPage defaultId="taka_jachai" />} />
+          <Route path="/privacy/iq-test" element={<AppPrivacyPage defaultId="mindforge_arena" />} />
+          <Route path="/privacy/mindforge_arena" element={<AppPrivacyPage defaultId="mindforge_arena" />} />
+          <Route path="/privacy/eternora" element={<AppPrivacyPage defaultId="eternora" />} />
+          <Route path="/privacy/:appId" element={<AppPrivacyPage />} />
         </Routes>
       </Router>
     </AuthProvider>

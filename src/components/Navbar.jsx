@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sparkles, User, Menu, X, Shield, LifeBuoy } from 'lucide-react';
+import { Sparkles, User, Menu, X, ShieldCheck, LifeBuoy } from 'lucide-react';
 import logo from '../../logo.png';
 import { useAuth } from '../context/AuthContext';
 
@@ -13,6 +13,7 @@ export default function Navbar() {
 
   return (
     <header className="navbar-wrapper">
+      {/* Main Persistent Sticky Navbar */}
       <div className="navbar-container">
         {/* Brand */}
         <Link to="/" className="navbar-brand">
@@ -43,27 +44,32 @@ export default function Navbar() {
           <Link to="/support" className={`nav-item ${location.pathname === '/support' ? 'active' : ''}`}>
             Support
           </Link>
+          {isAdmin && (
+            <Link to="/admin" className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}>
+              Admin
+            </Link>
+          )}
         </nav>
 
         {/* Action Controls */}
         <div className="navbar-actions">
           <Link to="/pricing" className={`btn-nav-pro ${entitlement.isPro ? 'is-pro' : ''}`}>
             <Sparkles className="btn-icon" />
-            <span>{entitlement.isPro ? 'Universal Pro' : 'Pro Access'}</span>
+            <span>{entitlement.isPro ? 'Pro Active ✓' : 'Get Pro Access'}</span>
           </Link>
 
           {user ? (
             <Link to="/account" className="btn-nav-account">
               <User className="btn-icon" />
-              <span>Dashboard</span>
+              <span className="truncate max-w-[100px]">{user.displayName || user.email.split('@')[0]}</span>
             </Link>
           ) : (
             <Link to="/login" className="btn-nav-login">
-              Login
+              Sign In
             </Link>
           )}
 
-          {/* Mobile menu toggle */}
+          {/* Mobile Menu Toggle */}
           <button
             className="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -79,7 +85,7 @@ export default function Navbar() {
         <div className="navbar-mobile-drawer">
           <div className="mobile-drawer-links">
             <Link to="/" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
-              Home
+              Home Overview
             </Link>
             <a href="/#apps" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
               Featured Mobile Apps
@@ -95,21 +101,22 @@ export default function Navbar() {
             </Link>
             <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
               <LifeBuoy className="icon-xs" />
-              <span>Contact & Support</span>
-            </Link>
-            <Link to={user ? "/account" : "/login"} onClick={() => setMobileMenuOpen(false)} className="mobile-link">
-              <User className="icon-xs" />
-              <span>{user ? "My Dashboard" : "Sign In / Register"}</span>
+              <span>Support</span>
             </Link>
             {isAdmin && (
               <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="mobile-link admin-link">
-                <Shield className="icon-xs" />
-                <span>Admin Operations</span>
+                <ShieldCheck className="icon-xs" />
+                <span>Admin Operations Portal</span>
               </Link>
             )}
+            <Link to={user ? "/account" : "/login"} onClick={() => setMobileMenuOpen(false)} className="mobile-link">
+              <User className="icon-xs" />
+              <span>{user ? `Dashboard (${user.displayName || user.email.split('@')[0]})` : "Sign In / Register"}</span>
+            </Link>
           </div>
         </div>
       )}
     </header>
   );
 }
+

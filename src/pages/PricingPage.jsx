@@ -5,16 +5,16 @@ import confetti from 'canvas-confetti';
 import { PRODUCTS, PRODUCT_LIST, SAAS_APPS } from '../config/products';
 import { CUSTOM_SERVICES } from '../config/services';
 import { useAuth } from '../context/AuthContext';
-import Topbar from '../components/Topbar';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function PricingPage() {
-  const { user, billingUserId, entitlement, grantProAccess } = useAuth();
+  const { user, billingUserId, entitlement, grantProAccess, isAdmin } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState('universal_yearly');
   const [openFaq, setOpenFaq] = useState(null);
   const [showSimModal, setShowSimModal] = useState(false);
   const [simPlan, setSimPlan] = useState(null);
+  const [simErrorMsg, setSimErrorMsg] = useState(null);
   const navigate = useNavigate();
 
   const handleSelectPlan = (planId) => {
@@ -23,7 +23,8 @@ export default function PricingPage() {
 
   const handleCheckoutClick = (plan) => {
     const bId = billingUserId || (user ? `busr_${user.uid.substring(0, 16)}` : "busr_guest");
-    const checkoutUrlWithParam = `${plan.checkoutUrl}?checkout[custom][billing_user_id]=${encodeURIComponent(bId)}`;
+    // checkoutUrl already contains ?option=...&recurrence=...&wanted=true — append & not ?
+    const checkoutUrlWithParam = `${plan.checkoutUrl}&billing_user_id=${encodeURIComponent(bId)}`;
 
     // If user is already pro with this plan, direct them to account
     if (entitlement.isPro && entitlement.planId === plan.id) {
@@ -40,13 +41,22 @@ export default function PricingPage() {
 
     // Provide choice to open real Lemon Squeezy checkout or simulate instant grant for testing
     setSimPlan(plan);
+    setSimErrorMsg(null);
     setShowSimModal(true);
   };
 
   const handleConfirmSimulation = () => {
     if (!simPlan) return;
+    if (!isAdmin) {
+      setSimErrorMsg("Instant Activation is strictly restricted to Admins and Co-Admins.");
+      return;
+    }
+
+    setSimErrorMsg(null);
     const bId = billingUserId || (user ? `busr_${user.uid.substring(0, 16)}` : "busr_demo_universal");
-    grantProAccess(bId, simPlan.id, simPlan.durationDays);
+    
+    // Grant Pro Access for exactly 1 hour (1, true)
+    grantProAccess(bId, simPlan.id, 1, true);
     setShowSimModal(false);
     confetti({
       particleCount: 120,
@@ -75,13 +85,12 @@ export default function PricingPage() {
     },
     {
       q: "What payment methods are supported for Pro subscriptions?",
-      a: "Subscriptions are processed securely via Lemon Squeezy, supporting Credit/Debit Cards, Google Pay, Apple Pay, and PayPal."
+      a: "Subscriptions are processed securely via Gumroad, supporting Credit/Debit Cards, Google Pay, Apple Pay, and PayPal."
     }
   ];
 
   return (
     <div className="page-shell-full">
-      <Topbar />
       <Navbar />
 
       <main className="pricing-main-container">
@@ -160,8 +169,8 @@ export default function PricingPage() {
                     {isCurrentPro
                       ? 'Current Active Plan'
                       : prod.type === 'lifetime'
-                      ? 'Get Lifetime Access'
-                      : `Subscribe ${prod.name.replace('Universal ', '')}`}
+                      ? `Get Lifetime Access — ${prod.priceFormatted}`
+                      : `Subscribe — ${prod.priceFormatted}`}
                   </span>
                 </button>
               </div>
@@ -272,24 +281,51 @@ export default function PricingPage() {
 
             <div className="modal-body space-y-4">
               <div className="checkout-choice-box">
-                <h4>Option 1: Live Lemon Squeezy Gateway</h4>
-                <p>Redirects to secure payment checkout in Bangladeshi Taka (BDT).</p>
+                <h4>Option 1: Live Gumroad Gateway (1-Week Free Trial)</h4>
+                <p>Redirects to secure payment checkout via Credit Card, Google/Apple Pay, or PayPal.</p>
                 <a
-                  href={`${simPlan.checkoutUrl}?checkout[custom][billing_user_id]=${encodeURIComponent(billingUserId || (user ? `busr_${user.uid.substring(0, 16)}` : "busr_guest"))}`}
+                  href={`${simPlan.checkoutUrl}&billing_user_id=${encodeURIComponent(billingUserId || (user ? `busr_${user.uid.substring(0, 16)}` : "busr_guest"))}`}
                   target="_blank"
                   rel="noreferrer"
                   className="btn-live-checkout"
                 >
-                  <span>Open Lemon Squeezy Gateway ↗</span>
+                  <span>Open Gumroad Gateway ↗</span>
                 </a>
               </div>
 
               <div className="checkout-choice-box demo-box">
-                <h4>Option 2: Instant Activation (Testing & Sandbox)</h4>
-                <p>Simulate instant payment verification and grant Pro access to your current account immediately.</p>
-                <button onClick={handleConfirmSimulation} className="btn-sim-activate">
-                  <span>Instant Activate Pro Now</span>
-                </button>
+                <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                  <h4>Option 2: Instant Activation (Testing & Sandbox)</h4>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    ⏱️ 1 Hour Limit — Admins & Co-Admins Only
+                  </span>
+                </div>
+                <p>Simulate instant payment verification and grant Pro access to your current account immediately (valid for 1 hour).</p>
+
+                {simErrorMsg && (
+                  <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs my-2 font-medium">
+                    {simErrorMsg}
+                  </div>
+                )}
+
+                {!isAdmin ? (
+                  <div className="space-y-2 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setSimErrorMsg("Instant Activation is only available to Admins and Co-Admins.")}
+                      className="btn-sim-activate opacity-60 w-full"
+                    >
+                      <span>Instant Activate Pro Now (Restricted)</span>
+                    </button>
+                    <p className="text-[11px] text-amber-400 font-medium">
+                      🔒 Only available to Admins and Co-Admins.
+                    </p>
+                  </div>
+                ) : (
+                  <button onClick={handleConfirmSimulation} className="btn-sim-activate">
+                    <span>Instant Activate Pro Now (1 Hour)</span>
+                  </button>
+                )}
               </div>
             </div>
 

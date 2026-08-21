@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MessageCircle, MapPin, Clock, ShieldCheck, Sparkles } from 'lucide-react';
 import logo from '../../logo.png';
 import { useAuth } from '../context/AuthContext';
+import { getAppsList, toPrivacySlug } from '../config/appsManager';
 
 export default function Footer() {
   const { adminSettings } = useAuth();
+  const [apps, setApps] = useState(() => getAppsList());
   const phone = adminSettings?.contact?.primaryPhone || "+880 1769-920324";
   const email = adminSettings?.contact?.primaryEmail || "asifhasan10122000@gmail.com";
   const waLink = adminSettings?.contact?.whatsappLink || "https://wa.me/8801769920324";
-  const location = adminSettings?.contact?.location || "Dhaka, Bangladesh";
+  const location = adminSettings?.contact?.location || "608/1, Kazla, Rajshahi, Bangladesh";
   const hours = adminSettings?.contact?.officeHours || "Monday - Saturday: 9:00 AM - 6:00 PM (GMT+6)";
   const regNo = adminSettings?.contact?.registrationNo || "ASI-TECH-2026-BD";
+
+  useEffect(() => {
+    const refreshApps = () => setApps(getAppsList());
+    window.addEventListener('asivision_apps_updated', refreshApps);
+    return () => window.removeEventListener('asivision_apps_updated', refreshApps);
+  }, []);
 
   return (
     <footer className="modern-footer">
@@ -113,9 +121,9 @@ export default function Footer() {
           <div className="footer-legal-links">
             <Link to="/terms">Terms of Service</Link>
             <Link to="/refund">Refund Policy</Link>
-            <Link to="/privacy/taka-jachai">Taka Jachai Privacy</Link>
-            <Link to="/privacy/iq-test">MindForge Privacy</Link>
-            <Link to="/privacy/eternora">Eternora Privacy</Link>
+            {apps.map((app) => (
+              <Link key={app.id} to={`/privacy/${toPrivacySlug(app.id)}`}>{app.name} Privacy</Link>
+            ))}
           </div>
         </div>
       </div>

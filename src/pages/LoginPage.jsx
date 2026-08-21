@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Sparkles, ArrowRight, Loader2, KeyRound, Eye, EyeOff, ShieldCheck, Smartphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Topbar from '../components/Topbar';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import logo from '../../logo.png';
@@ -114,7 +113,6 @@ export default function LoginPage() {
 
   return (
     <div className="page-shell-full">
-      <Topbar />
       <Navbar />
 
       <main className="auth-page-container">

@@ -67,6 +67,7 @@ export function AuthProvider({ children }) {
         planId: null,
         planName: "Free Explorer",
         isLifetime: false,
+        isCancelled: false,
         expiresAt: null,
         startedAt: null,
         source: null,
@@ -77,7 +78,17 @@ export function AuthProvider({ children }) {
 
     const now = Date.now();
     const isLifetime = userEnt.isLifetime || userEnt.planId === "universal_lifetime";
-    const expiresTimestamp = userEnt.expiresAt ? new Date(userEnt.expiresAt).getTime() : null;
+    
+    // Ensure fixed, immutable expiresAt timestamp that never resets on re-login
+    let fixedExpiresAt = userEnt.expiresAt;
+    if (!isLifetime && !fixedExpiresAt) {
+      const startMs = userEnt.startedAt ? new Date(userEnt.startedAt).getTime() : now;
+      fixedExpiresAt = new Date(startMs + 30 * 24 * 60 * 60 * 1000).toISOString();
+      store[bId] = { ...userEnt, expiresAt: fixedExpiresAt };
+      saveStoredEntitlements(store);
+    }
+
+    const expiresTimestamp = fixedExpiresAt ? new Date(fixedExpiresAt).getTime() : null;
     const isExpired = !isLifetime && expiresTimestamp && expiresTimestamp < now;
 
     if (isExpired) {
@@ -86,7 +97,8 @@ export function AuthProvider({ children }) {
         planId: userEnt.planId,
         planName: "Expired Pro",
         isLifetime: false,
-        expiresAt: userEnt.expiresAt,
+        isCancelled: userEnt.isCancelled || false,
+        expiresAt: fixedExpiresAt,
         startedAt: userEnt.startedAt,
         source: userEnt.source,
         activeApps: ["taka_jachai"]
@@ -98,7 +110,8 @@ export function AuthProvider({ children }) {
         planId: userEnt.planId,
         planName: planConfig ? planConfig.name : (isLifetime ? "Universal Lifetime Pro" : "Universal Pro"),
         isLifetime: isLifetime,
-        expiresAt: isLifetime ? null : userEnt.expiresAt,
+        isCancelled: userEnt.isCancelled || false,
+        expiresAt: isLifetime ? null : fixedExpiresAt,
         startedAt: userEnt.startedAt || new Date().toISOString(),
         source: userEnt.source || "central_billing",
         activeApps: ["mindforge_arena", "eternora", "taka_jachai", "ai_scrapers", "automation_agents"]
@@ -184,9 +197,10 @@ export function AuthProvider({ children }) {
   };
 
   // Helper for manual / simulated Pro activation
-  const grantProAccess = (targetBillingUserId, planId = "universal_yearly", days = 365) => {
+  const grantProAccess = (targetBillingUserId, planId = "universal_yearly", durationValue = 365, isHours = false) => {
     const isLifetime = planId === "universal_lifetime";
-    const expiresAt = isLifetime ? null : new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+    const durationMs = isHours ? durationValue * 60 * 60 * 1000 : durationValue * 24 * 60 * 60 * 1000;
+    const expiresAt = isLifetime ? null : new Date(Date.now() + durationMs).toISOString();
     
     const store = getStoredEntitlements();
     store[targetBillingUserId] = {
@@ -195,7 +209,7 @@ export function AuthProvider({ children }) {
       isLifetime,
       startedAt: new Date().toISOString(),
       expiresAt,
-      source: "admin_override"
+      source: isHours ? "instant_activation_sandbox" : "admin_override"
     };
     saveStoredEntitlements(store);
 
@@ -214,8 +228,35 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const markSubscriptionCancelled = (reason = '') => {
+    if (!billingUserId) return;
+    const store = getStoredEntitlements();
+    const current = store[billingUserId] || (user?.email && store[user.email]) || {};
+    const updated = {
+      ...current,
+      isCancelled: true,
+      cancelledAt: new Date().toISOString(),
+      cancelReason: reason
+    };
+    store[billingUserId] = updated;
+    if (user?.email) {
+      store[user.email] = updated;
+    }
+    saveStoredEntitlements(store);
+    evaluateUserEntitlement(billingUserId, user?.email);
+  };
+
+  const allAdminEmails = [
+    ...(adminSettings.adminEmails || []),
+    ...(adminSettings.coadminEmails || [])
+  ].map(e => e.toLowerCase());
+
   const isAdmin = Boolean(
-    user?.email && adminSettings.adminEmails.map(e => e.toLowerCase()).includes(user.email.toLowerCase())
+    user?.email && allAdminEmails.includes(user.email.toLowerCase())
+  );
+
+  const isCoadmin = Boolean(
+    user?.email && (adminSettings.coadminEmails || []).map(e => e.toLowerCase()).includes(user.email.toLowerCase())
   );
 
   return (
@@ -226,6 +267,7 @@ export function AuthProvider({ children }) {
         billingUserId,
         entitlement,
         isAdmin,
+        isCoadmin,
         adminSettings,
         loginWithEmail,
         registerWithEmail,
@@ -234,10 +276,11 @@ export function AuthProvider({ children }) {
         logout,
         grantProAccess,
         revokeProAccess,
+        markSubscriptionCancelled,
         refreshEntitlement: () => evaluateUserEntitlement(billingUserId, user?.email)
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

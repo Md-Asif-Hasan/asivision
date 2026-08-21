@@ -1,13 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Topbar from '../components/Topbar';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function RefundPage() {
   return (
     <div className="page-shell-full">
-      <Topbar />
       <Navbar />
 
       <main className="legal-content-container reveal">

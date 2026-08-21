@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/webhooks/lemonsqueezy",
-      "destination": "/api/webhooks/lemonsqueezy.js"
+      "source": "/api/webhooks/gumroad",
+      "destination": "/api/webhooks/gumroad.js"
     },
     {
       "source": "/api/entitlement",
