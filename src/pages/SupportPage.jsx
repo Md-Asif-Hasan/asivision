@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Mail, Phone, MessageCircle, Clock, MapPin, Send,
   CheckCircle2, AlertCircle, HelpCircle, ShieldCheck, Sparkles, CreditCard
@@ -11,8 +11,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function SupportPage() {
-  const { adminSettings } = useAuth();
+  const { user, adminSettings } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const phone = adminSettings?.contact?.primaryPhone || "+880 1769-920324";
   const email = adminSettings?.contact?.primaryEmail || "asifhasan10122000@gmail.com";
@@ -43,6 +44,18 @@ export default function SupportPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!user) {
+      navigate('/login', {
+        state: {
+          from: '/support',
+          preselectedService: serviceType,
+          message: 'Please sign in or create an account to get quota and submit your service quote request.'
+        }
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const inquiryPayload = {

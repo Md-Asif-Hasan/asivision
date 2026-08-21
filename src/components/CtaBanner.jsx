@@ -1,12 +1,37 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles, MessageCircle, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function CtaBanner() {
-  const { adminSettings } = useAuth();
+  const { user, adminSettings } = useAuth();
+  const navigate = useNavigate();
   const phone = adminSettings?.contact?.primaryPhone || "+880 1769-920324";
   const waLink = adminSettings?.contact?.whatsappLink || "https://wa.me/8801769920324";
+
+  const handleQuotaClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/support',
+          message: 'Please sign in or create an account to get quota or request a quote.'
+        }
+      });
+    }
+  };
+
+  const handleProClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/pricing',
+          message: 'Please sign in or create an account to get Pro access.'
+        }
+      });
+    }
+  };
 
   return (
     <section className="cta-banner-wrapper reveal">
@@ -29,12 +54,12 @@ export default function CtaBanner() {
           </p>
 
           <div className="cta-btn-group">
-            <Link to="/support" className="btn-cta-primary">
+            <Link to="/support" onClick={handleQuotaClick} className="btn-cta-primary">
               <span>Discuss Your Project / Get Quote</span>
               <ArrowRight className="icon-xs" />
             </Link>
 
-            <Link to="/pricing" className="btn-cta-secondary">
+            <Link to="/pricing" onClick={handleProClick} className="btn-cta-secondary">
               <Sparkles className="icon-xs" />
               <span>Unlock Pro SaaS Access</span>
             </Link>

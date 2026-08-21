@@ -12,6 +12,14 @@ export default function LoginPage() {
   const location = useLocation();
 
   const redirectUrl = location.state?.from || '/account';
+  const planId = location.state?.selectedPlanId;
+  const preselectedService = location.state?.preselectedService;
+  const customMessage = location.state?.message;
+
+  const targetState = {
+    ...(planId ? { selectedPlanId: planId } : {}),
+    ...(preselectedService ? { preselectedService } : {})
+  };
 
   const [mode, setMode] = useState('signin'); // 'signin' | 'signup' | 'reset'
   const [email, setEmail] = useState('');
@@ -24,7 +32,7 @@ export default function LoginPage() {
 
   // If already logged in, redirect
   if (user && !isLoading) {
-    navigate('/account');
+    navigate(redirectUrl, { state: targetState });
   }
 
   const handleEmailAuth = async (e) => {
@@ -50,7 +58,7 @@ export default function LoginPage() {
       } else {
         await loginWithEmail(email, password);
       }
-      navigate(redirectUrl);
+      navigate(redirectUrl, { state: targetState });
     } catch (err) {
       setErrorMsg(mapFirebaseError(err.code));
     } finally {
@@ -63,7 +71,7 @@ export default function LoginPage() {
     setErrorMsg(null);
     try {
       await loginWithGoogle();
-      navigate(redirectUrl);
+      navigate(redirectUrl, { state: targetState });
     } catch (err) {
       setErrorMsg(mapFirebaseError(err.code) || 'Google sign-in was cancelled or failed.');
     } finally {
@@ -136,6 +144,24 @@ export default function LoginPage() {
 
           <div className="auth-form-card">
             {/* Feedback Banners */}
+            {customMessage && (
+              <div className="auth-message-banner info-banner" style={{
+                background: 'rgba(99, 102, 241, 0.15)',
+                border: '1px solid rgba(99, 102, 241, 0.35)',
+                color: '#a5b4fc',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <Sparkles className="icon-xs text-indigo-400 shrink-0" />
+                <span>{customMessage}</span>
+              </div>
+            )}
             {errorMsg && (
               <div className="auth-message-banner error-banner">{errorMsg}</div>
             )}

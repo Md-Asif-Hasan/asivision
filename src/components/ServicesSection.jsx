@@ -1,9 +1,38 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle2, ArrowRight, ShieldAlert, CreditCard, Sparkles, HelpCircle } from 'lucide-react';
 import { CUSTOM_SERVICES, VALUE_PROPOSITIONS } from '../config/services';
+import { useAuth } from '../context/AuthContext';
 
 export default function ServicesSection() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleQuotaClick = (e, serviceTitle) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/support',
+          preselectedService: serviceTitle,
+          message: 'Please sign in or create an account to get quota or request a service quote.'
+        }
+      });
+    }
+  };
+
+  const handleProClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/pricing',
+          message: 'Please sign in or create an account to get Pro access.'
+        }
+      });
+    }
+  };
+
   return (
     <section id="services" className="section services-modern-section">
       {/* Section Header */}
@@ -58,7 +87,12 @@ export default function ServicesSection() {
                 <div className="service-pricing-tag">
                   <span className="price-label">{srv.pricingStart}</span>
                 </div>
-                <Link to="/support" state={{ preselectedService: srv.title }} className="btn-service-action">
+                <Link
+                  to="/support"
+                  state={{ preselectedService: srv.title }}
+                  onClick={(e) => handleQuotaClick(e, srv.title)}
+                  className="btn-service-action"
+                >
                   <span>Get Started / Quote</span>
                   <ArrowRight className="icon-xs" />
                 </Link>
@@ -83,11 +117,11 @@ export default function ServicesSection() {
           </p>
         </div>
         <div className="callout-actions">
-          <Link to="/pricing" className="btn-callout-saas">
+          <Link to="/pricing" onClick={handleProClick} className="btn-callout-saas">
             <Sparkles className="icon-xs" />
             <span>View SaaS Pro Plans</span>
           </Link>
-          <Link to="/support" className="btn-callout-quote">
+          <Link to="/support" onClick={(e) => handleQuotaClick(e, 'General Partnership & Inquiries')} className="btn-callout-quote">
             <span>Request Custom Service</span>
           </Link>
         </div>

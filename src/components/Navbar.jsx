@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sparkles, User, Menu, X, ShieldCheck, LifeBuoy } from 'lucide-react';
 import logo from '../../logo.png';
 import { useAuth } from '../context/AuthContext';
@@ -8,8 +8,22 @@ export default function Navbar() {
   const { user, entitlement, isAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isHome = location.pathname === '/';
+
+  const handleProClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      setMobileMenuOpen(false);
+      navigate('/login', {
+        state: {
+          from: '/pricing',
+          message: 'Please sign in or create an account to get Pro access.'
+        }
+      });
+    }
+  };
 
   return (
     <header className="navbar-wrapper">
@@ -53,7 +67,7 @@ export default function Navbar() {
 
         {/* Action Controls */}
         <div className="navbar-actions">
-          <Link to="/pricing" className={`btn-nav-pro ${entitlement.isPro && !entitlement.isCancelled ? 'is-pro' : ''}`}>
+          <Link to="/pricing" onClick={handleProClick} className={`btn-nav-pro ${entitlement.isPro && !entitlement.isCancelled ? 'is-pro' : ''}`}>
             <Sparkles className="btn-icon" />
             <span>{entitlement.isPro && !entitlement.isCancelled ? 'Pro Active ✓' : 'Get Pro Access'}</span>
           </Link>
@@ -96,7 +110,7 @@ export default function Navbar() {
             <a href="/#services" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
               Services (Google Play & Marketing)
             </a>
-            <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="mobile-link highlight-link">
+            <Link to="/pricing" onClick={handleProClick} className="mobile-link highlight-link">
               ⚡ Pro Access & SaaS Plans
             </Link>
             <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="mobile-link">

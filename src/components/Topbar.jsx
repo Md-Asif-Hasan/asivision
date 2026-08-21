@@ -1,13 +1,39 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Phone, Mail, MessageCircle, Sparkles, User, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Topbar() {
   const { user, isAdmin, entitlement, adminSettings } = useAuth();
+  const navigate = useNavigate();
+
   const phone = adminSettings?.contact?.primaryPhone || "+880 1769-920324";
   const email = adminSettings?.contact?.primaryEmail || "asifhasan10122000@gmail.com";
   const waLink = adminSettings?.contact?.whatsappLink || "https://wa.me/8801769920324";
+
+  const handleProClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/pricing',
+          message: 'Please sign in or create an account to get Pro access.'
+        }
+      });
+    }
+  };
+
+  const handleQuotaClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/support',
+          message: 'Please sign in or create an account to get quota or request a service quote.'
+        }
+      });
+    }
+  };
 
   return (
     <div className="topbar-announcement">
@@ -28,11 +54,11 @@ export default function Topbar() {
         </div>
 
         <div className="topbar-action-items">
-          <Link to="/support" className="topbar-pill-btn quote-pill">
-            Get a Quote
+          <Link to="/support" onClick={handleQuotaClick} className="topbar-pill-btn quote-pill">
+            Get Quota / Quote
           </Link>
           
-          <Link to="/pricing" className={`topbar-pill-btn pro-pill ${entitlement.isPro ? 'pro-active' : ''}`}>
+          <Link to="/pricing" onClick={handleProClick} className={`topbar-pill-btn pro-pill ${entitlement.isPro ? 'pro-active' : ''}`}>
             <Sparkles className="icon-xs" />
             <span>{entitlement.isPro ? 'Pro Active ✓' : 'Get Pro Access'}</span>
           </Link>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../logo.png';
 
 // Shared components
@@ -19,7 +19,7 @@ import RefundPage from './pages/RefundPage';
 import AppPrivacyPage from './pages/AppPrivacyPage';
 
 // Auth context
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
 
@@ -585,6 +585,20 @@ function ProjectsHorizontalSection({ onOpenLightbox }) {
 
 function LandingPage() {
   const [lightboxImg, setLightboxImg] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login', {
+        state: {
+          from: '/pricing',
+          message: 'Please sign in or create an account to get Pro access.'
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -628,7 +642,7 @@ function LandingPage() {
                   <span>Explore Featured Apps</span>
                   <span>→</span>
                 </a>
-                <Link to="/pricing" className="btn btn-primary" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' }}>
+                <Link to="/pricing" onClick={handleProClick} className="btn btn-primary" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' }}>
                   <span>⚡ Get Pro Access</span>
                 </Link>
                 <a href="#services" className="btn btn-secondary">

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Check, Sparkles, Shield, Zap, AlertCircle, ArrowRight, HelpCircle, ChevronDown, ChevronUp, Lock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PRODUCTS, PRODUCT_LIST, SAAS_APPS } from '../config/products';
@@ -16,13 +16,38 @@ export default function PricingPage() {
   const [simPlan, setSimPlan] = useState(null);
   const [simErrorMsg, setSimErrorMsg] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.selectedPlanId) {
+      setSelectedPlan(location.state.selectedPlanId);
+      const matchedPlan = PRODUCT_LIST.find(p => p.id === location.state.selectedPlanId);
+      if (matchedPlan && user) {
+        setSimPlan(matchedPlan);
+        setSimErrorMsg(null);
+        setShowSimModal(true);
+      }
+    }
+  }, [location.state, user]);
 
   const handleSelectPlan = (planId) => {
     setSelectedPlan(planId);
   };
 
   const handleCheckoutClick = (plan) => {
-    const bId = billingUserId || (user ? `busr_${user.uid.substring(0, 16)}` : "busr_guest");
+    // Require user to be signed in before getting pro access / purchasing plan
+    if (!user) {
+      navigate('/login', {
+        state: {
+          from: '/pricing',
+          selectedPlanId: plan.id,
+          message: 'Please sign in or create an account to complete your Pro Access purchase.'
+        }
+      });
+      return;
+    }
+
+    const bId = billingUserId || `busr_${user.uid.substring(0, 16)}`;
     // checkoutUrl already contains ?option=...&recurrence=...&wanted=true — append & not ?
     const checkoutUrlWithParam = `${plan.checkoutUrl}&billing_user_id=${encodeURIComponent(bId)}`;
 
