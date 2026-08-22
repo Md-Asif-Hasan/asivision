@@ -79,7 +79,6 @@ const appsData = [
       '/assets/previews/eternora/Generated Image July 24, 2026 - 11_32AM.png',
       '/assets/previews/eternora/Generated Image July 24, 2026 - 11_33AM.png',
       '/assets/previews/eternora/Generated Image July 24, 2026 - 11_34AM.png',
-      '/assets/previews/eternora/Generated Image July 24, 2026 - 11_35AM.png',
     ],
   },
 ];
