@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { getAdminSettings } from "../config/adminSettings";
 import { PRODUCTS } from "../config/products";
+import { checkIsPartner, getCachedPartnerStatus, setCachedPartnerStatus, createOrUpdateUserProfile } from "../config/partnershipManager";
 
 const AuthContext = createContext(null);
 
@@ -36,6 +37,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [billingUserId, setBillingUserId] = useState(null);
+  const [isPartner, setIsPartner] = useState(false);
   const [entitlement, setEntitlement] = useState({
     isPro: false,
     planId: null,
@@ -55,6 +57,17 @@ export function AuthProvider({ children }) {
     window.addEventListener("asivision_settings_updated", handleSettingsUpdate);
     return () => window.removeEventListener("asivision_settings_updated", handleSettingsUpdate);
   }, []);
+
+  // Listen for partner status changes (e.g., admin activates from panel)
+  useEffect(() => {
+    const handlePartnerUpdate = () => {
+      if (user) {
+        checkIsPartner(user.uid).then(setIsPartner);
+      }
+    };
+    window.addEventListener("asivision_partner_updated", handlePartnerUpdate);
+    return () => window.removeEventListener("asivision_partner_updated", handlePartnerUpdate);
+  }, [user]);
 
   // Compute entitlement for user
   const evaluateUserEntitlement = (bId, uEmail) => {
@@ -127,6 +140,19 @@ export function AuthProvider({ children }) {
         setBillingUserId(bId);
         localStorage.setItem("asivision_billing_user_id", bId);
         evaluateUserEntitlement(bId, firebaseUser.email);
+        // Check partner status (cache-first, then Firestore)
+        const cached = getCachedPartnerStatus(firebaseUser.uid);
+        if (cached !== null) {
+          setIsPartner(cached);
+        } else {
+          checkIsPartner(firebaseUser.uid).then((status) => setIsPartner(status));
+        }
+        // Ensure user profile exists in Firestore
+        createOrUpdateUserProfile(firebaseUser.uid, {
+          email: firebaseUser.email || '',
+          displayName: firebaseUser.displayName || '',
+          photoURL: firebaseUser.photoURL || '',
+        });
       } else {
         const storedBId = localStorage.getItem("asivision_billing_user_id");
         if (storedBId) {
@@ -145,6 +171,7 @@ export function AuthProvider({ children }) {
             activeApps: ["taka_jachai"]
           });
         }
+        setIsPartner(false);
       }
       setLoading(false);
     });
@@ -157,6 +184,8 @@ export function AuthProvider({ children }) {
     const bId = `busr_${cred.user.uid.substring(0, 16)}`;
     setBillingUserId(bId);
     evaluateUserEntitlement(bId, cred.user.email);
+    const partnerStatus = await checkIsPartner(cred.user.uid);
+    setIsPartner(partnerStatus);
     return cred.user;
   };
 
@@ -165,6 +194,8 @@ export function AuthProvider({ children }) {
     const bId = `busr_${cred.user.uid.substring(0, 16)}`;
     setBillingUserId(bId);
     evaluateUserEntitlement(bId, cred.user.email);
+    await createOrUpdateUserProfile(cred.user.uid, { email, displayName: '' });
+    setIsPartner(false);
     return cred.user;
   };
 
@@ -173,6 +204,13 @@ export function AuthProvider({ children }) {
     const bId = `busr_${cred.user.uid.substring(0, 16)}`;
     setBillingUserId(bId);
     evaluateUserEntitlement(bId, cred.user.email);
+    const partnerStatus = await checkIsPartner(cred.user.uid);
+    setIsPartner(partnerStatus);
+    await createOrUpdateUserProfile(cred.user.uid, {
+      email: cred.user.email || '',
+      displayName: cred.user.displayName || '',
+      photoURL: cred.user.photoURL || '',
+    });
     return cred.user;
   };
 
@@ -184,6 +222,7 @@ export function AuthProvider({ children }) {
     await signOut(auth);
     localStorage.removeItem("asivision_billing_user_id");
     setBillingUserId(null);
+    setIsPartner(false);
     setEntitlement({
       isPro: false,
       planId: null,
@@ -268,6 +307,7 @@ export function AuthProvider({ children }) {
         entitlement,
         isAdmin,
         isCoadmin,
+        isPartner,
         adminSettings,
         loginWithEmail,
         registerWithEmail,
@@ -277,7 +317,10 @@ export function AuthProvider({ children }) {
         grantProAccess,
         revokeProAccess,
         markSubscriptionCancelled,
-        refreshEntitlement: () => evaluateUserEntitlement(billingUserId, user?.email)
+        refreshEntitlement: () => evaluateUserEntitlement(billingUserId, user?.email),
+        refreshPartnerStatus: () => {
+          if (user) checkIsPartner(user.uid).then(setIsPartner);
+        }
       }}
     >
       {!loading && children}

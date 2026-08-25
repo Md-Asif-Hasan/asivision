@@ -17,6 +17,8 @@ import AdminPage from './pages/AdminPage';
 import TermsPage from './pages/TermsPage';
 import RefundPage from './pages/RefundPage';
 import AppPrivacyPage from './pages/AppPrivacyPage';
+import PartnershipPage from './pages/PartnershipPage';
+import GetQuotePage from './pages/GetQuotePage';
 
 // Auth context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -795,6 +797,10 @@ function App() {
 
           {/* Admin Portal */}
           <Route path="/admin" element={<AdminPage />} />
+
+          {/* Partnership Program */}
+          <Route path="/partnership" element={<PartnershipPage />} />
+          <Route path="/partnership/quote" element={<GetQuotePage />} />
 
           {/* Legal Pages */}
           <Route path="/terms" element={<TermsPage />} />

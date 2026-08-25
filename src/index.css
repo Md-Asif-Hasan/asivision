@@ -4593,3 +4593,415 @@ a {
 }
 
 
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PARTNERSHIP PROGRAM — Page, Form & Card Styles
+══════════════════════════════════════════════════════════════════════════════ */
+
+.partner-page-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px 80px;
+  width: 100%;
+}
+
+.partner-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.partner-page-header h1 {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 800;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+
+.partnership-info-box {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: left;
+}
+
+/* Nav item for partner tab */
+.nav-item-partner {
+  color: #818cf8 !important;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
+  padding: 5px 12px !important;
+  font-weight: 600 !important;
+}
+
+.nav-item-partner:hover, .nav-item-partner.active {
+  background: rgba(99, 102, 241, 0.18) !important;
+  color: #a5b4fc !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+.partner-mobile-link {
+  color: #818cf8 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS — Global Improvements
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* Topbar: hide email on very small screens */
+@media (max-width: 480px) {
+  .topbar-inner {
+    gap: 8px;
+    padding: 6px 12px;
+  }
+  .topbar-contact-items {
+    gap: 10px;
+  }
+  .topbar-link span {
+    display: none;
+  }
+  .topbar-link.topbar-whatsapp span {
+    display: inline;
+    font-size: 0.75rem;
+  }
+  .hide-mobile {
+    display: none !important;
+  }
+  .topbar-action-items {
+    gap: 6px;
+  }
+  .topbar-pill-btn {
+    padding: 4px 10px;
+    font-size: 0.72rem;
+  }
+}
+
+/* Navbar: make desktop links wrap on medium screens */
+@media (max-width: 900px) {
+  .navbar-desktop-nav {
+    display: none;
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  .navbar-mobile-drawer {
+    display: none !important;
+  }
+}
+
+/* Navbar: ensure brand and actions don't overflow */
+@media (max-width: 600px) {
+  .navbar-container {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .navbar-brand {
+    gap: 8px;
+  }
+  .brand-name {
+    font-size: 1rem;
+  }
+  .brand-tagline {
+    font-size: 0.65rem;
+  }
+  .btn-nav-pro span,
+  .btn-nav-account span {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .btn-nav-pro {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Hero section mobile */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr !important;
+    gap: 32px;
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 6vw, 2.8rem) !important;
+  }
+  .hero-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .hero-visual-card {
+    max-width: 100% !important;
+  }
+}
+
+/* Apps section mobile */
+@media (max-width: 768px) {
+  .project-slide-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .app-preview-side,
+  .project-slide-preview {
+    display: flex;
+    justify-content: center;
+  }
+  .phone-mockup-wrapper {
+    max-width: 240px;
+  }
+  .horizontal-slider-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .slider-main-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* Services section mobile */
+@media (max-width: 640px) {
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .section-heading h2 {
+    font-size: clamp(1.4rem, 5vw, 2rem) !important;
+  }
+}
+
+/* Pricing page mobile */
+@media (max-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .pricing-hero h1 {
+    font-size: clamp(1.6rem, 5vw, 2.5rem) !important;
+  }
+}
+
+/* Account page mobile */
+@media (max-width: 768px) {
+  .account-main-container {
+    padding: 16px 12px 60px !important;
+  }
+  .account-hero-card {
+    padding: 16px !important;
+  }
+  .account-profile-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .account-actions-group {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .matrix-columns-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .countdown-grid {
+    gap: 8px !important;
+  }
+  .count-val {
+    font-size: clamp(1.6rem, 5vw, 2.5rem) !important;
+  }
+  .invoice-table {
+    font-size: 0.75rem;
+  }
+  .invoice-table th,
+  .invoice-table td {
+    padding: 8px 8px !important;
+  }
+}
+
+/* Admin page mobile */
+@media (max-width: 768px) {
+  .admin-main-container {
+    padding: 16px 12px 60px !important;
+  }
+  .admin-header-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .admin-header-row h1 {
+    font-size: clamp(1.3rem, 4vw, 1.8rem) !important;
+  }
+  .admin-fields-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-fields-grid .full-width {
+    grid-column: span 1 !important;
+  }
+  .card-header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Support page mobile */
+@media (max-width: 768px) {
+  .support-main-container {
+    padding: 16px 12px 60px !important;
+  }
+  .support-contact-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Footer mobile */
+@media (max-width: 640px) {
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .footer-bottom-row {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+/* Auth / Login page mobile */
+@media (max-width: 480px) {
+  .auth-page-container {
+    padding: 16px 12px 48px !important;
+  }
+  .auth-card-wrapper {
+    max-width: 100% !important;
+  }
+  .auth-form-card {
+    padding: 20px 16px !important;
+  }
+}
+
+/* Partner page mobile */
+@media (max-width: 640px) {
+  .partner-page-container {
+    padding: 20px 12px 60px;
+  }
+  .partner-page-header {
+    flex-direction: column;
+  }
+}
+
+/* General: forms responsive */
+@media (max-width: 640px) {
+  .form-group label {
+    font-size: 0.8rem;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.88rem;
+  }
+  .linking-form {
+    flex-direction: column !important;
+  }
+}
+
+/* Privacy page mobile */
+@media (max-width: 768px) {
+  .privacy-hero {
+    padding: 24px 16px !important;
+  }
+  .privacy-hero h1 {
+    font-size: clamp(1.4rem, 4vw, 2rem) !important;
+  }
+  .privacy-trust-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .privacy-about-card {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Topbar on tablet */
+@media (max-width: 768px) {
+  .topbar-inner {
+    justify-content: space-between;
+  }
+  .topbar-contact-items .topbar-link:not(.topbar-whatsapp) {
+    display: none;
+  }
+}
+
+/* Tabs scroll on mobile */
+@media (max-width: 768px) {
+  .admin-tabs-row {
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tab-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+/* Pro app links grid mobile */
+@media (max-width: 640px) {
+  .pro-app-links-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .upcoming-apps-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* CTA Banner mobile */
+@media (max-width: 640px) {
+  .cta-inner {
+    flex-direction: column !important;
+    text-align: center;
+  }
+  .cta-actions {
+    justify-content: center;
+  }
+}
+
+/* Project grid mobile */
+@media (max-width: 640px) {
+  .projects-grid-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Ensure images never overflow */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Table responsive wrapper */
+.invoice-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* General utility: hide on mobile */
+@media (max-width: 640px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+/* Smooth scroll for mobile tabs */
+.admin-tabs-row,
+.tabs-scrollable {
+  scroll-snap-type: x mandatory;
+}
+.admin-tab-btn {
+  scroll-snap-align: start;
+}

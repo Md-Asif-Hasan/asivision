@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Sparkles, User, Menu, X, ShieldCheck, LifeBuoy } from 'lucide-react';
+import { Sparkles, User, Menu, X, ShieldCheck, LifeBuoy, Handshake } from 'lucide-react';
 import logo from '../../logo.png';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const { user, entitlement, isAdmin } = useAuth();
+  const { user, entitlement, isAdmin, isPartner } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -61,6 +61,12 @@ export default function Navbar() {
           {isAdmin && (
             <Link to="/admin" className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}>
               Admin
+            </Link>
+          )}
+          {isPartner && (
+            <Link to="/partnership" className={`nav-item nav-item-partner ${location.pathname.startsWith('/partnership') ? 'active' : ''}`}>
+              <Handshake className="icon-xs" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+              Partnership
             </Link>
           )}
         </nav>
@@ -121,6 +127,12 @@ export default function Navbar() {
               <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="mobile-link admin-link">
                 <ShieldCheck className="icon-xs" />
                 <span>Admin Operations Portal</span>
+              </Link>
+            )}
+            {isPartner && (
+              <Link to="/partnership" onClick={() => setMobileMenuOpen(false)} className="mobile-link partner-mobile-link">
+                <Handshake className="icon-xs" />
+                <span>Partnership Dashboard</span>
               </Link>
             )}
             <Link to={user ? "/account" : "/login"} onClick={() => setMobileMenuOpen(false)} className="mobile-link">

@@ -84,7 +84,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Col 5: Contact & Office Hours */}
+          {/* Col 5: Contact, Social & Office Hours */}
           <div className="footer-col footer-col-contact">
             <h4 className="footer-heading">Direct Contact & Hours</h4>
             <div className="footer-contact-block">
@@ -107,6 +107,27 @@ export default function Footer() {
               <div className="footer-contact-row">
                 <Mail className="icon-xs text-indigo-400 shrink-0" />
                 <a href={`mailto:${email}`}>{email}</a>
+              </div>
+            </div>
+
+            {/* Official Community Links */}
+            <h4 className="footer-heading" style={{ marginTop: '1.25rem' }}>Community</h4>
+            <div className="footer-contact-block">
+              <div className="footer-contact-row">
+                <span style={{ fontSize: '0.85rem' }}>✈</span>
+                <a href="https://t.me/asivsion" target="_blank" rel="noreferrer">Telegram Channel</a>
+              </div>
+              <div className="footer-contact-row">
+                <span style={{ fontSize: '0.85rem' }}>💬</span>
+                <a href="https://whatsapp.com/channel/0029VbDIFTQInlqKFijLoc3O" target="_blank" rel="noreferrer">WhatsApp Channel</a>
+              </div>
+              <div className="footer-contact-row">
+                <span style={{ fontSize: '0.85rem' }}>👤</span>
+                <a href="https://www.facebook.com/profile.php?id=61592729756449" target="_blank" rel="noreferrer">Facebook Page</a>
+              </div>
+              <div className="footer-contact-row">
+                <span style={{ fontSize: '0.85rem' }}>🌐</span>
+                <a href="https://asivision.vercel.app/#apps" target="_blank" rel="noreferrer">asivision.vercel.app</a>
               </div>
             </div>
           </div>

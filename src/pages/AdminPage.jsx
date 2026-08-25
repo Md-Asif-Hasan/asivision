@@ -1,14 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShieldCheck, Sliders, UserCheck, UserX, Save, RefreshCw,
   CreditCard, Phone, Mail, Sparkles, CheckCircle2, AlertTriangle,
   Lock, Key, Send, Search, ArrowRight, Eye, EyeOff,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Users, Handshake, Trash2, Edit2, ExternalLink, Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAdminSettings, saveAdminSettings, resetAdminSettings, getInquiries, deleteInquiry } from '../config/adminSettings';
 import { getAppsList, saveApp, deleteApp, resetAppsList } from '../config/appsManager';
+import {
+  getAllUsers, deleteUser as deleteFirestoreUser, createOrUpdateUserProfile,
+  activatePartnership, deactivatePartnership,
+  getAllPartnerApps, deletePartnerApp, getAllQuoteRequests
+} from '../config/partnershipManager';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -38,6 +43,20 @@ export default function AdminPage() {
         })
         .catch(() => {})
         .finally(() => setIsLoadingCancellations(false));
+    }
+    if (activeTab === 'users' && !usersLoaded) {
+      setUsersLoading(true);
+      getAllUsers().then((data) => {
+        setAllUsers(data);
+        setUsersLoading(false);
+        setUsersLoaded(true);
+      });
+    }
+    if (activeTab === 'partners') {
+      setPartnerAppsLoading(true);
+      setQuoteLoading(true);
+      getAllPartnerApps().then((data) => { setPartnerApps(data); setPartnerAppsLoading(false); });
+      getAllQuoteRequests().then((data) => { setQuoteRequests(data); setQuoteLoading(false); });
     }
   }, [activeTab]);
 
@@ -76,6 +95,20 @@ export default function AdminPage() {
 
   // Co-Admin Management State
   const [newCoAdminEmail, setNewCoAdminEmail] = useState('');
+
+  // Users Management State
+  const [allUsers, setAllUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [userActionMsg, setUserActionMsg] = useState(null);
+  const [userSearch, setUserSearch] = useState('');
+
+  // Partner Apps State
+  const [partnerApps, setPartnerApps] = useState([]);
+  const [partnerAppsLoading, setPartnerAppsLoading] = useState(false);
+  const [quoteRequests, setQuoteRequests] = useState([]);
+  const [quoteLoading, setQuoteLoading] = useState(false);
 
   // Admin access passcode bypass for local testing
   const [adminPasscode, setAdminPasscode] = useState('');
@@ -289,6 +322,14 @@ export default function AdminPage() {
             </button>
 
             <button
+              onClick={() => setActiveTab('cloudflare')}
+              className={`admin-tab-btn ${activeTab === 'cloudflare' ? 'active' : ''}`}
+            >
+              <Globe className="icon-xs" />
+              <span>Cloudflare R2 Bucket</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('payoneer')}
               className={`admin-tab-btn ${activeTab === 'payoneer' ? 'active' : ''}`}
             >
@@ -318,6 +359,22 @@ export default function AdminPage() {
             >
               <Phone className="icon-xs" />
               <span>Contact Info</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`admin-tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+            >
+              <Users className="icon-xs" />
+              <span>User Management</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('partners')}
+              className={`admin-tab-btn ${activeTab === 'partners' ? 'active' : ''}`}
+            >
+              <Handshake className="icon-xs" />
+              <span>Partners & Quotes</span>
             </button>
           </div>
 
@@ -363,8 +420,8 @@ export default function AdminPage() {
                   howUsed: 'Deliver core application functionality and sync account preferences.\nAnalyze aggregated performance telemetry to optimize server response times.\nVerify user Pro subscription entitlement status securely.',
                   storageSecurity: 'Passwords hashed using bcrypt with secure salt parameters.\nHTTPS/TLS 1.3 encrypted data transmission across all endpoints.\nSessions secured with HttpOnly cookies and encrypted tokens.',
                   userRights: 'Users retain full ownership of account records and may request data export or account erasure at any time via privacy@asivision.com or asifhasan10122000@gmail.com.',
-                  serviceAccountEmail: '',
-                  privateKey: '',
+                  serviceAccountEmail: settings.firebase?.serviceAccountEmail || 'gumroad-access@asivision-payments.iam.gserviceaccount.com',
+                  privateKey: settings.firebase?.privateKey || '',
                   isSaas: true,
                   status: 'Live & Pro-Enabled'
                 })}
@@ -458,27 +515,27 @@ export default function AdminPage() {
                   </div>
 
                   <div className="form-group full-width">
-                    <label>Cloudflare Logo Image URL (or R2 Bucket link)</label>
+                    <label>Cloudflare R2 Logo Image URL (asivision-bucket)</label>
                     <input
                       type="text"
                       value={editingApp.logoUrl}
                       onChange={(e) => setEditingApp({ ...editingApp, logoUrl: e.target.value })}
                       className="admin-input font-mono"
-                      placeholder="https://pub-xxx.r2.dev/logo.png or https://imagedelivery.net/..."
+                      placeholder="https://pub-8c781e8170374f06a590d96f616c98bd.r2.dev/application-images/logo.png"
                     />
-                    <span className="field-hint">Upload image to Cloudflare Images / R2 and paste public CDN URL here.</span>
+                    <span className="field-hint">Upload image to bucket <code>asivision-bucket/application-images/</code> and paste public URL.</span>
                   </div>
 
                   <div className="form-group full-width">
-                    <label>Cloudflare App Preview Screenshot Banner URL</label>
+                    <label>Cloudflare R2 App Preview Screenshot Banner URL</label>
                     <input
                       type="text"
                       value={editingApp.previewImageUrl}
                       onChange={(e) => setEditingApp({ ...editingApp, previewImageUrl: e.target.value })}
                       className="admin-input font-mono"
-                      placeholder="https://pub-xxx.r2.dev/preview-banner.png"
+                      placeholder="https://pub-8c781e8170374f06a590d96f616c98bd.r2.dev/application-images/preview-banner.png"
                     />
-                    <span className="field-hint">High resolution screenshot or banner hosted on Cloudflare CDN.</span>
+                    <span className="field-hint">High resolution screenshot uploaded to <code>asivision-bucket/application-images/</code>.</span>
                   </div>
 
                   <div className="form-group">
@@ -641,9 +698,16 @@ export default function AdminPage() {
                       </div>
                       <p className="text-xs text-indigo-400 font-medium">{a.category}</p>
                       <p className="text-xs text-slate-400">{a.description}</p>
-                      {a.serviceAccountEmail && (
-                        <p className="text-[11px] text-slate-500 font-mono">Service Email: {a.serviceAccountEmail}</p>
-                      )}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono mt-1">
+                        {a.serviceAccountEmail && (
+                          <span className="text-slate-400">📧 {a.serviceAccountEmail}</span>
+                        )}
+                        {a.privateKey ? (
+                          <span className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">🔑 RSA Private Key Configured</span>
+                        ) : (
+                          <span className="text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">⚠️ Key Missing</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -1057,8 +1121,7 @@ export default function AdminPage() {
                     })
                   }
                   className="admin-input font-mono"
-                  placeholder="firebase-adminsdk-...@asivision-payments.iam.gserviceaccount.com"
-                  required
+                  placeholder="gumroad-access@asivision-payments.iam.gserviceaccount.com"
                 />
                 <span className="field-hint">Service Account email used for backend serverless Admin SDK authorization.</span>
               </div>
@@ -1075,10 +1138,9 @@ export default function AdminPage() {
                     })
                   }
                   className="admin-textarea font-mono text-xs"
-                  placeholder="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-                  required
+                  placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"
                 />
-                <span className="field-hint">RSA Private key for Admin SDK authentication (keep safe & secure).</span>
+                <span className="field-hint">RSA Private key for Admin SDK authentication (keep safe &amp; secure).</span>
               </div>
             </div>
 
@@ -1086,6 +1148,167 @@ export default function AdminPage() {
               <button type="submit" className="btn-save-settings">
                 <Save className="icon-xs" />
                 <span>Save Firebase Config</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* TAB: CLOUDFLARE R2 BUCKET & CDN PARAMETERS */}
+        {activeTab === 'cloudflare' && (
+          <form onSubmit={handleSaveSettings} className="admin-settings-card">
+            <div className="card-header-flex">
+              <div>
+                <h3>☁️ Cloudflare R2 Storage & Bucket Configuration</h3>
+                <p className="text-xs text-slate-400">
+                  Update Cloudflare Account ID, R2 Bucket Name, Public Dev/Custom Domain URLs, and S3 API endpoints dynamically across the platform.
+                </p>
+              </div>
+              <button type="submit" className="btn-save-settings">
+                <Save className="icon-xs" />
+                <span>Save Cloudflare Config</span>
+              </button>
+            </div>
+
+            <div className="admin-fields-grid">
+              <div className="form-group">
+                <label>Cloudflare Account ID</label>
+                <input
+                  type="text"
+                  value={settings.cloudflare?.accountId || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, accountId: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="ce183a072f5c0f81a67c9e948e3d3520"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>R2 Bucket Name</label>
+                <input
+                  type="text"
+                  value={settings.cloudflare?.bucketName || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, bucketName: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="asivision-bucket"
+                  required
+                />
+              </div>
+
+              <div className="form-group full-width">
+                <label>Public Development / Custom Domain Base URL</label>
+                <input
+                  type="url"
+                  value={settings.cloudflare?.publicDevUrl || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, publicDevUrl: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="https://pub-8c781e8170374f06a590d96f616c98bd.r2.dev"
+                  required
+                />
+                <span className="field-hint">Public R2 dev URL or custom domain exposed to the internet.</span>
+              </div>
+
+              <div className="form-group">
+                <label>Application Images Subfolder Path</label>
+                <input
+                  type="text"
+                  value={settings.cloudflare?.imagesFolder || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, imagesFolder: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="/application-images/"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Full Application Images Base URL</label>
+                <input
+                  type="url"
+                  value={settings.cloudflare?.imagesBaseUrl || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, imagesBaseUrl: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="https://pub-8c781e8170374f06a590d96f616c98bd.r2.dev/application-images/"
+                  required
+                />
+              </div>
+
+              <div className="form-group full-width">
+                <label>S3 API Endpoint</label>
+                <input
+                  type="url"
+                  value={settings.cloudflare?.s3ApiEndpoint || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, s3ApiEndpoint: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="https://ce183a072f5c0f81a67c9e948e3d3520.r2.cloudflarestorage.com/asivision-bucket"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>R2 Access Key ID (Optional)</label>
+                <input
+                  type="text"
+                  value={settings.cloudflare?.accessKeyId || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, accessKeyId: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="Access key for S3 API uploads..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label>R2 Secret Access Key (Optional)</label>
+                <input
+                  type="password"
+                  value={settings.cloudflare?.secretAccessKey || ''}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      cloudflare: { ...settings.cloudflare, secretAccessKey: e.target.value }
+                    })
+                  }
+                  className="admin-input font-mono"
+                  placeholder="Secret key for S3 API uploads..."
+                />
+              </div>
+            </div>
+
+            <div className="card-footer-action">
+              <button type="submit" className="btn-save-settings">
+                <Save className="icon-xs" />
+                <span>Save Cloudflare Config</span>
               </button>
             </div>
           </form>
@@ -1456,6 +1679,348 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            TAB: USER MANAGEMENT
+        ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'users' && (
+          <div className="admin-settings-card">
+            <div className="card-header-flex" style={{ flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h3>👥 User Management — Firebase Auth Users</h3>
+                <p className="text-xs text-slate-400">
+                  View, manage, and update all registered users. Activate or deactivate the Partnership Program for any user. Data is fetched from Firestore.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUsersLoading(true);
+                    setUsersLoaded(false);
+                    getAllUsers().then((data) => { setAllUsers(data); setUsersLoading(false); setUsersLoaded(true); });
+                  }}
+                  className="btn-save-settings"
+                >
+                  <RefreshCw className={`icon-xs ${usersLoading ? 'animate-spin' : ''}`} />
+                  <span>Refresh Users</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div style={{ position: 'relative', marginBottom: '16px' }}>
+              <Search className="icon-xs" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#71717a', pointerEvents: 'none' }} />
+              <input
+                type="text"
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder="Search by email, display name, or UID..."
+                style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '10px 14px 10px 38px', color: '#f4f4f5', fontSize: '0.85rem', fontFamily: 'inherit' }}
+              />
+            </div>
+
+            {usersLoading ? (
+              <div className="text-center py-12">
+                <RefreshCw className="icon-md text-indigo-400 mx-auto mb-2 animate-spin" />
+                <p className="text-slate-400 text-sm">Loading users from Firestore...</p>
+              </div>
+            ) : allUsers.length === 0 ? (
+              <div className="text-center py-12 border border-dashed border-slate-800 rounded-xl my-4">
+                <Users className="icon-md text-slate-600 mx-auto mb-2" />
+                <p className="text-slate-300 font-bold text-sm">No Users Found in Firestore</p>
+                <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                  Users are created in Firestore when they sign in. Click "Refresh Users" to reload.
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="text-xs text-slate-500 mb-3">
+                  Total: {allUsers.length} user{allUsers.length !== 1 ? 's' : ''} · Showing{' '}
+                  {userSearch
+                    ? allUsers.filter((u) => {
+                        const q = userSearch.toLowerCase();
+                        return (u.email || '').toLowerCase().includes(q) || (u.displayName || '').toLowerCase().includes(q) || (u.uid || '').toLowerCase().includes(q);
+                      }).length
+                    : allUsers.length} matching result{(userSearch ? allUsers.filter((u) => { const q = userSearch.toLowerCase(); return (u.email || '').toLowerCase().includes(q) || (u.displayName || '').toLowerCase().includes(q) || (u.uid || '').toLowerCase().includes(q); }).length : allUsers.length) !== 1 ? 's' : ''}
+                </p>
+
+                {editingUser && (
+                  <div style={{ background: '#0e0f17', border: '1px solid rgba(99,102,241,0.4)', borderRadius: '16px', padding: '20px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                      <h4 style={{ color: '#f4f4f5', fontWeight: 700 }}>Editing: {editingUser.email}</h4>
+                      <button onClick={() => setEditingUser(null)} style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.3)', color: '#f43f5e', padding: '5px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600 }}>✕ Cancel</button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+                      <div className="form-group">
+                        <label>Display Name</label>
+                        <input type="text" className="admin-input" value={editingUser.displayName || ''} onChange={(e) => setEditingUser({ ...editingUser, displayName: e.target.value })} />
+                      </div>
+                      <div className="form-group">
+                        <label>Email</label>
+                        <input type="email" className="admin-input" value={editingUser.email || ''} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} />
+                      </div>
+                      <div className="form-group">
+                        <label>Notes (internal)</label>
+                        <input type="text" className="admin-input" value={editingUser.notes || ''} onChange={(e) => setEditingUser({ ...editingUser, notes: e.target.value })} placeholder="Admin notes..." />
+                      </div>
+                    </div>
+                    {userActionMsg && (
+                      <div className={`auth-message-banner ${userActionMsg.success ? 'success-banner' : 'error-banner'} mb-3`}>{userActionMsg.message}</div>
+                    )}
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const ok = await createOrUpdateUserProfile(editingUser.uid, {
+                            displayName: editingUser.displayName,
+                            email: editingUser.email,
+                            notes: editingUser.notes,
+                          });
+                          if (ok) {
+                            setAllUsers((prev) => prev.map((u) => u.uid === editingUser.uid ? { ...u, ...editingUser } : u));
+                            setUserActionMsg({ success: true, message: 'User profile updated successfully.' });
+                            setTimeout(() => { setEditingUser(null); setUserActionMsg(null); }, 2000);
+                          } else {
+                            setUserActionMsg({ success: false, message: 'Failed to update user. Try again.' });
+                          }
+                        }}
+                        className="btn-save-settings"
+                      >
+                        <Save className="icon-xs" />
+                        <span>Save Changes</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  {allUsers
+                    .filter((u) => {
+                      if (!userSearch) return true;
+                      const q = userSearch.toLowerCase();
+                      return (u.email || '').toLowerCase().includes(q) || (u.displayName || '').toLowerCase().includes(q) || (u.uid || '').toLowerCase().includes(q);
+                    })
+                    .map((u) => (
+                      <div key={u.uid || u.id} style={{ background: '#0e0f17', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'flex-start', gap: '14px', flexWrap: 'wrap' }}>
+                        {/* Avatar */}
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#818cf8', fontSize: '1rem', fontWeight: 700, flexShrink: 0 }}>
+                          {(u.displayName || u.email || '?').charAt(0).toUpperCase()}
+                        </div>
+
+                        {/* Info */}
+                        <div style={{ flex: 1, minWidth: '160px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
+                            <strong style={{ color: '#f4f4f5', fontSize: '0.88rem' }}>{u.displayName || u.email?.split('@')[0] || 'User'}</strong>
+                            {u.isPartner && (
+                              <span style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.4)', color: '#818cf8', fontSize: '0.7rem', padding: '1px 7px', borderRadius: '999px', fontWeight: 700 }}>
+                                🤝 Partner
+                              </span>
+                            )}
+                          </div>
+                          <p style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '2px' }}>{u.email}</p>
+                          <code style={{ color: '#52525b', fontSize: '0.7rem', fontFamily: 'monospace' }}>{u.uid}</code>
+                          {u.notes && <p style={{ color: '#a1a1aa', fontSize: '0.75rem', marginTop: '4px', fontStyle: 'italic' }}>Note: {u.notes}</p>}
+                          <p style={{ color: '#52525b', fontSize: '0.7rem', marginTop: '3px' }}>
+                            Joined: {u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString() : (u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—')}
+                          </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {u.isPartner ? (
+                            <button
+                              onClick={async () => {
+                                if (!window.confirm(`Deactivate partnership for ${u.email}?`)) return;
+                                const ok = await deactivatePartnership(u.uid);
+                                if (ok) setAllUsers((prev) => prev.map((usr) => usr.uid === u.uid ? { ...usr, isPartner: false } : usr));
+                              }}
+                              style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.25)', color: '#f43f5e', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }}
+                            >
+                              <UserX size={13} />
+                              <span>Deactivate Partnership</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={async () => {
+                                if (!window.confirm(`Activate Partnership Program for ${u.email}?`)) return;
+                                const ok = await activatePartnership(u.uid, u.email);
+                                if (ok) setAllUsers((prev) => prev.map((usr) => usr.uid === u.uid ? { ...usr, isPartner: true } : usr));
+                              }}
+                              style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }}
+                            >
+                              <Handshake size={13} />
+                              <span>Activate Partnership</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setEditingUser({ ...u })}
+                            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#a1a1aa', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }}
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!window.confirm(`Permanently delete ${u.email} from Firestore? (Firebase Auth record is NOT deleted)\n\nThis only removes their Firestore profile.`)) return;
+                              const ok = await deleteFirestoreUser(u.uid);
+                              if (ok) setAllUsers((prev) => prev.filter((usr) => usr.uid !== u.uid));
+                            }}
+                            style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', color: '#f43f5e', padding: '6px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }}
+                            title="Delete Firestore profile (does not delete Firebase Auth)"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            TAB: PARTNERS & QUOTES
+        ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'partners' && (
+          <div className="admin-settings-card">
+            <div className="card-header-flex" style={{ flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h3>🤝 Partner Apps & Quote Requests</h3>
+                <p className="text-xs text-slate-400">
+                  View all registered partner apps and quote requests. Activate partnership from the Users tab for any user after they pay.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPartnerAppsLoading(true);
+                  setQuoteLoading(true);
+                  getAllPartnerApps().then((data) => { setPartnerApps(data); setPartnerAppsLoading(false); });
+                  getAllQuoteRequests().then((data) => { setQuoteRequests(data); setQuoteLoading(false); });
+                }}
+                className="btn-save-settings"
+              >
+                <RefreshCw className={`icon-xs ${partnerAppsLoading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            {/* Quote Requests */}
+            <div style={{ marginBottom: '28px' }}>
+              <h4 style={{ color: '#f4f4f5', fontWeight: 700, fontSize: '0.95rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Mail size={16} style={{ color: '#818cf8' }} />
+                Quote Requests ({quoteRequests.length})
+              </h4>
+              {quoteLoading ? (
+                <div className="text-center py-8"><RefreshCw className="icon-md text-indigo-400 mx-auto animate-spin" /></div>
+              ) : quoteRequests.length === 0 ? (
+                <div className="text-center py-8 border border-dashed border-slate-800 rounded-xl">
+                  <p className="text-slate-500 text-sm">No quote requests yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {quoteRequests.map((q) => (
+                    <div key={q.id} style={{ background: '#0e0f17', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <strong style={{ color: '#f4f4f5', fontSize: '0.88rem' }}>{q.name || q.email}</strong>
+                          <span style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', fontSize: '0.7rem', padding: '1px 7px', borderRadius: '999px', fontWeight: 700 }}>{q.status || 'pending'}</span>
+                          <span style={{ color: '#52525b', fontSize: '0.72rem' }}>{q.preferredPayment}</span>
+                        </div>
+                        <span style={{ color: '#52525b', fontSize: '0.72rem' }}>
+                          {q.submittedAt?.toDate ? q.submittedAt.toDate().toLocaleDateString() : (q.submittedAt ? new Date(q.submittedAt).toLocaleDateString() : '—')}
+                        </span>
+                      </div>
+                      <p style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '4px' }}>
+                        <strong style={{ color: '#a1a1aa' }}>App:</strong> {q.appName} — <a href={q.appLink} target="_blank" rel="noreferrer" style={{ color: '#6366f1', fontSize: '0.72rem' }}>{q.appLink}</a>
+                      </p>
+                      <p style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '4px' }}><strong style={{ color: '#a1a1aa' }}>Email:</strong> <a href={`mailto:${q.email}`} style={{ color: '#6366f1' }}>{q.email}</a>{q.phone && ` · Phone: ${q.phone}`}</p>
+                      <p style={{ color: '#a1a1aa', fontSize: '0.78rem', lineHeight: 1.6 }}>{q.appDescription}</p>
+                      {q.message && <p style={{ color: '#71717a', fontSize: '0.75rem', marginTop: '4px', fontStyle: 'italic' }}>Message: "{q.message}"</p>}
+                      <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <a href={`mailto:${q.email}?subject=RE: Partnership Quote for ${encodeURIComponent(q.appName || '')}&body=Hi ${encodeURIComponent(q.name || '')},%0D%0A%0D%0AThank you for your partnership inquiry.`} style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', padding: '5px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px', textDecoration: 'none' }}>
+                          <Mail size={12} />
+                          <span>Reply by Email</span>
+                        </a>
+                        <a href={`https://wa.me/${(q.phone || '').replace(/[^0-9]/g, '')}?text=Hi ${encodeURIComponent(q.name || '')}%2C I received your partnership quote request for ${encodeURIComponent(q.appName || '')}.`} target="_blank" rel="noreferrer" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', color: '#10b981', padding: '5px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px', textDecoration: 'none' }}>
+                          <Send size={12} />
+                          <span>WhatsApp</span>
+                        </a>
+                        <button
+                          onClick={() => setActiveTab('users')}
+                          style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', color: '#818cf8', padding: '5px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}
+                        >
+                          <UserCheck size={12} />
+                          <span>Activate in Users Tab</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Partner Apps */}
+            <div>
+              <h4 style={{ color: '#f4f4f5', fontWeight: 700, fontSize: '0.95rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={16} style={{ color: '#6366f1' }} />
+                Registered Partner Apps ({partnerApps.length})
+              </h4>
+              {partnerAppsLoading ? (
+                <div className="text-center py-8"><RefreshCw className="icon-md text-indigo-400 mx-auto animate-spin" /></div>
+              ) : partnerApps.length === 0 ? (
+                <div className="text-center py-8 border border-dashed border-slate-800 rounded-xl">
+                  <p className="text-slate-500 text-sm">No partner apps registered yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {partnerApps.map((app) => (
+                    <div key={app.appId || app.id} style={{ background: '#0e0f17', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                      {app.logoUrl && (
+                        <div style={{ width: '48px', height: '48px', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+                          <img src={app.logoUrl} alt={app.appName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: '160px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
+                          <strong style={{ color: '#f4f4f5', fontSize: '0.88rem' }}>{app.appName}</strong>
+                          <span style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: '0.7rem', padding: '1px 7px', borderRadius: '999px', fontWeight: 700 }}>Active</span>
+                        </div>
+                        <p style={{ color: '#818cf8', fontSize: '0.75rem', marginBottom: '3px' }}>{app.category}</p>
+                        <p style={{ color: '#71717a', fontSize: '0.75rem', lineHeight: 1.5 }}>{app.description?.substring(0, 100)}{(app.description || '').length > 100 ? '...' : ''}</p>
+                        <p style={{ color: '#52525b', fontSize: '0.7rem', marginTop: '3px' }}>Owner: {app.ownerEmail}</p>
+                        {app.appLink && (
+                          <a href={app.appLink} target="_blank" rel="noreferrer" style={{ color: '#6366f1', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                            <ExternalLink size={10} />
+                            <span>App Link</span>
+                          </a>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <Link to={`/privacy/${app.appId || app.id}`} target="_blank" className="btn-view-privacy" style={{ fontSize: '0.75rem' }}>
+                          View Privacy
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            if (!window.confirm(`Delete partner app "${app.appName}"?`)) return;
+                            const ok = await deletePartnerApp(app.appId || app.id);
+                            if (ok) setPartnerApps((prev) => prev.filter((a) => (a.appId || a.id) !== (app.appId || app.id)));
+                          }}
+                          style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)', color: '#f43f5e', padding: '5px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <Trash2 size={12} />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </main>
